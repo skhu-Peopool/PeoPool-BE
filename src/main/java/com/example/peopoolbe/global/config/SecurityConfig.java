@@ -29,7 +29,7 @@ public class SecurityConfig{
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/**", "/webjars/**").permitAll()
+                        .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/**", "/webjars/**", "/").permitAll()
                         .requestMatchers("/signup", "/login").permitAll()
                         .anyRequest().authenticated()
                 )

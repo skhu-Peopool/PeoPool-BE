@@ -22,11 +22,19 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    @Operation(summary = "회원가입", description = "자체로그인을 통한 유저 가입")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "가입 성공")
+    })
     @PostMapping("/signup")
     public ResponseEntity<TokenResDto> signUp(@RequestBody MemberSignUpReq memberSignUpReq) {
         return ResponseEntity.ok(memberService.signUp(memberSignUpReq));
     }
 
+    @Operation(summary = "로그인", description = "토큰을 통한 유저 로그인")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "로그인 성공")
+    })
     @GetMapping("/user")
     public ResponseEntity<UserInfo> getUserInfo(Principal principal) {
         return ResponseEntity.ok(memberService.getUserInfo(principal));

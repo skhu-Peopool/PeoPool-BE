@@ -25,22 +25,22 @@ jobs:
       - name: Build Spring Boot App
         run: ./gradlew clean bootJar
 
-      - name: Move jar to PeoPool-BE/app.jar
+      - name: Move jar to ./app.jar
         run: |
-          cp build/libs/*.jar PeoPool-BE/app.jar
+          cp build/libs/*.jar ./app.jar
 
       - name: List JAR to verify
-        run: ls -al PeoPool-BE/
+        run: ls -al .
 
-      - name: Copy PeoPool-BE directory to EC2
+      - name: Copy app.jar directory to EC2
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.REMOTE_IP }}
           username: ${{ secrets.REMOTE_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "PeoPool-BE"
-          target: "/home/park/PeoPool"
+          source: "."
+          target: "/home/park/PeoPool/PeoPool-BE"
 
       - name: Restart Docker (build backend image)
         uses: appleboy/ssh-action@master

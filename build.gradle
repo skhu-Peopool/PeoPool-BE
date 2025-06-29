@@ -39,6 +39,10 @@ dependencies {
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
 
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0' // Swagger
+
+	implementation 'org.hibernate.validator:hibernate-validator' // Jakarta Bean Validation
+	implementation 'org.glassfish:jakarta.el:4.0.2'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {

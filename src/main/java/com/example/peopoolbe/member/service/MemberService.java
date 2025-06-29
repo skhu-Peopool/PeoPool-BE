@@ -1,11 +1,13 @@
 package com.example.peopoolbe.member.service;
 
 import com.example.peopoolbe.global.jwt.TokenProvider;
+import com.example.peopoolbe.member.api.dto.request.MemberLoginReq;
 import com.example.peopoolbe.member.api.dto.request.MemberSignUpReq;
 import com.example.peopoolbe.member.api.dto.response.TokenResDto;
 import com.example.peopoolbe.member.api.dto.response.UserInfo;
 import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.domain.repository.MemberRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,16 @@ public class MemberService {
                 .email(memberSignUpReq.email())
                 .password(passwordEncoder.encode(memberSignUpReq.password()))
                 .build());
+
+        return tokenProvider.createToken(member);
+    }
+
+    public TokenResDto login(MemberLoginReq memberLoginReq) {
+        Member member = memberRepository.findByUserId(memberLoginReq.id())
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 멤버"));
+
+        if (!passwordEncoder.matches(memberLoginReq.password(), member.getPassword()))
+            throw new RuntimeException("비밀번호 불일치");
 
         return tokenProvider.createToken(member);
     }

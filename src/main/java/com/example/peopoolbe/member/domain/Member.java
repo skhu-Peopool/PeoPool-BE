@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Member extends BaseEntity {
 
-    @Column(name = "USER_ID", nullable = false)
+    @Column(name = "USER_ID", nullable = false, unique = true)
     private String userId;
 
     @Column(name = "USER_PASSWORD", nullable = false)
@@ -20,7 +20,7 @@ public class Member extends BaseEntity {
     @Column(name = "USER_NAME", nullable = false)
     private String name;
 
-    @Column(name = "USER_EMAIL", nullable = false)
+    @Column(name = "USER_EMAIL", nullable = false, unique = true)
     private String email;
 
     @Column(name = "USER_PROFILE_IMG")

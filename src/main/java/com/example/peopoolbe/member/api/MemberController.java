@@ -36,7 +36,7 @@ public class MemberController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그인 성공")
     })
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<TokenResDto> login(@RequestBody MemberLoginReq memberLoginReq) {
         return ResponseEntity.ok(memberService.login(memberLoginReq));
     }

@@ -57,6 +57,15 @@ public class TokenProvider {
                 .build();
     }
 
+    public TokenResDto refreshToken(String refreshToken) {
+        String accessToken = accessTokenReIssue(refreshToken).accessToken();
+
+        return TokenResDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
     private String accessTokenBuilder(Member member) {
         long nowTime = (new Date().getTime());
         Date accessTokenExpiredTime = new Date(nowTime + accessTokenValidityTime);

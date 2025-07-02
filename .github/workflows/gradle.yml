@@ -23,22 +23,26 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build Spring Boot App
-        run: ./gradlew clean bootjar
+        run: ./gradlew clean bootJar
 
-      - name: List JAR files
-        run: ls -al build/libs
-        
-      - name: Copy JAR to EC2
+      - name: Move jar to ./app.jar
+        run: |
+          cp build/libs/*.jar ./app.jar
+
+      - name: List JAR to verify
+        run: ls -al .
+
+      - name: Copy app.jar directory to EC2
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.REMOTE_IP }}
           username: ${{ secrets.REMOTE_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "build/libs/*.jar"
-          target: "/home/park/PeoPool/"
+          source: "."
+          target: "/home/park/PeoPool/PeoPool-BE"
 
-      - name: Restart Docker
+      - name: Restart Docker (build backend image)
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.REMOTE_IP }}
@@ -47,5 +51,4 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /home/park/PeoPool
-            docker-compose down
-            docker-compose up -d --build
+            docker-compose up -d --build backend

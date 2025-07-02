@@ -1,4 +1,4 @@
-package com.example.peopoolbe.global.jwt;
+package com.example.peopoolbe.global.jwt.service;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -2,13 +2,15 @@ package com.example.peopoolbe.member.api;
 
 import com.example.peopoolbe.member.api.dto.request.MemberLoginReq;
 import com.example.peopoolbe.member.api.dto.request.MemberSignUpReq;
-import com.example.peopoolbe.member.api.dto.response.TokenResDto;
+import com.example.peopoolbe.global.jwt.dto.TokenResDto;
 import com.example.peopoolbe.member.api.dto.response.UserInfo;
 import com.example.peopoolbe.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,11 +27,11 @@ public class MemberController {
 
     @Operation(summary = "회원가입", description = "자체로그인을 통한 유저 가입")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "가입 성공")
+            @ApiResponse(responseCode = "201", description = "가입 성공")
     })
     @PostMapping("/signup")
     public ResponseEntity<TokenResDto> signUp(@RequestBody MemberSignUpReq memberSignUpReq) {
-        return ResponseEntity.ok(memberService.signUp(memberSignUpReq));
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberService.signUp(memberSignUpReq));
     }
 
     @Operation(summary = "로그인", description = "유저 id, password를 입력하여 로그인")
@@ -37,8 +39,8 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "로그인 성공")
     })
     @PostMapping("/login")
-    public ResponseEntity<TokenResDto> login(@RequestBody MemberLoginReq memberLoginReq) {
-        return ResponseEntity.ok(memberService.login(memberLoginReq));
+    public ResponseEntity<TokenResDto> login(@RequestBody MemberLoginReq memberLoginReq, HttpServletResponse response) {
+        return ResponseEntity.ok(memberService.login(memberLoginReq, response));
     }
 
     @Operation(summary = "유저 정보 확인", description = "토큰을 통한 유저 정보 확인")

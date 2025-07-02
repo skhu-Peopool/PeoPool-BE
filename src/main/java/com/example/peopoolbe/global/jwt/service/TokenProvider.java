@@ -1,16 +1,22 @@
-package com.example.peopoolbe.global.jwt;
+package com.example.peopoolbe.global.jwt.service;
 
-import com.example.peopoolbe.member.api.dto.response.TokenResDto;
+import com.example.peopoolbe.global.jwt.domain.RefreshToken;
+import com.example.peopoolbe.global.jwt.domain.repository.RefreshTokenRepository;
+import com.example.peopoolbe.global.jwt.dto.AccTokenResDto;
+import com.example.peopoolbe.global.jwt.dto.TokenResDto;
 import com.example.peopoolbe.member.domain.Member;
+import com.example.peopoolbe.member.domain.repository.MemberRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -29,17 +35,25 @@ public class TokenProvider {
 
     private final Key key;
     private final long accessTokenValidityTime;
+    private final long refreshTokenValidityTime;
+    private final MemberRepository memberRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public TokenProvider(@Value("${jwt.secret}") String secretKey,
-                         @Value("${jwt.access-token-validity-in-milliseconds}") long accessTokenValidityTime) {
+                         @Value("${jwt.access-token-validity-in-milliseconds}") long accessTokenValidityTime,
+                         @Value("${jwt.refresh-token-validity-in-milliseconds}") long refreshTokenValidityTime, MemberRepository memberRepository, RefreshTokenRepository refreshTokenRepository) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.accessTokenValidityTime = accessTokenValidityTime;
+        this.refreshTokenValidityTime = refreshTokenValidityTime;
+        this.memberRepository = memberRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     public TokenResDto createToken(Member member) {
         return TokenResDto.builder()
                 .accessToken(accessTokenBuilder(member))
+                .refreshToken(refreshTokenBuilder(member))
                 .build();
     }
 
@@ -53,6 +67,33 @@ public class TokenProvider {
                 .setExpiration(accessTokenExpiredTime)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    private String refreshTokenBuilder(Member member) {
+        long nowTime = (new Date().getTime());
+        Date refreshTokenExpiredTime = new Date(nowTime + refreshTokenValidityTime);
+
+        String refreshToken = Jwts.builder()
+                .setSubject(member.getId().toString())
+                .setExpiration(refreshTokenExpiredTime)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        refreshTokenRepository.save(RefreshToken.builder()
+                .refreshToken(refreshToken)
+                .build());
+
+        return refreshToken;
+    }
+
+    public AccTokenResDto accessTokenReIssue(String refreshToken) {
+        Long userId = Long.parseLong(parseClaims(refreshToken).getSubject());
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 사용자"));
+
+        return AccTokenResDto.builder()
+                .accessToken(accessTokenBuilder(member))
+                .build();
     }
 
     public Authentication getAuthentication(String accessToken) {
@@ -97,12 +138,12 @@ public class TokenProvider {
         }
     }
 
-    private Claims parseClaims(String accessToken) {
+    private Claims parseClaims(String token) {
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
-                    .parseClaimsJws(accessToken)
+                    .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();

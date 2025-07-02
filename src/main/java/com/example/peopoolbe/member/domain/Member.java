@@ -1,6 +1,7 @@
 package com.example.peopoolbe.member.domain;
 
 import com.example.peopoolbe.global.entity.BaseEntity;
+import com.example.peopoolbe.global.jwt.domain.RefreshToken;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,6 +30,10 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "USER_ROLE", nullable = false)
     private Role role;
+
+//    @OneToOne
+//    @JoinColumn(name = "ID")
+//    private RefreshToken refreshToken;
 
     @Builder
     public Member(String userId, String password, String name, String email) {

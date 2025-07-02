@@ -1,7 +1,7 @@
 package com.example.peopoolbe.global.config;
 
-import com.example.peopoolbe.global.jwt.JwtFilter;
-import com.example.peopoolbe.global.jwt.TokenProvider;
+import com.example.peopoolbe.global.jwt.service.JwtFilter;
+import com.example.peopoolbe.global.jwt.service.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +30,7 @@ public class SecurityConfig{
                 .logout(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/**", "/webjars/**", "/").permitAll()
-                        .requestMatchers("/signup", "/login").permitAll()
+                        .requestMatchers("/signup", "/login", "/token").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtFilter(tokenprovider), UsernamePasswordAuthenticationFilter.class)

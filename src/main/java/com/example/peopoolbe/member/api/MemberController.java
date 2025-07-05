@@ -2,7 +2,7 @@ package com.example.peopoolbe.member.api;
 
 import com.example.peopoolbe.member.api.dto.request.MemberLoginReq;
 import com.example.peopoolbe.member.api.dto.request.MemberSignUpReq;
-import com.example.peopoolbe.global.jwt.dto.TokenResDto;
+import com.example.peopoolbe.global.jwt.api.dto.TokenResDto;
 import com.example.peopoolbe.member.api.dto.response.UserInfo;
 import com.example.peopoolbe.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;

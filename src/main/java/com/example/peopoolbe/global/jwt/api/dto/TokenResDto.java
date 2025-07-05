@@ -1,4 +1,4 @@
-package com.example.peopoolbe.global.jwt.dto;
+package com.example.peopoolbe.global.jwt.api.dto;
 
 import lombok.Builder;
 

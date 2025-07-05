@@ -2,8 +2,8 @@ package com.example.peopoolbe.global.jwt.service;
 
 import com.example.peopoolbe.global.jwt.domain.RefreshToken;
 import com.example.peopoolbe.global.jwt.domain.repository.RefreshTokenRepository;
-import com.example.peopoolbe.global.jwt.dto.AccTokenResDto;
-import com.example.peopoolbe.global.jwt.dto.TokenResDto;
+import com.example.peopoolbe.global.jwt.api.dto.AccTokenResDto;
+import com.example.peopoolbe.global.jwt.api.dto.TokenResDto;
 import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.domain.repository.MemberRepository;
 import io.jsonwebtoken.*;

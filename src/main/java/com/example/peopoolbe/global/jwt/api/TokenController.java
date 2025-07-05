@@ -1,6 +1,6 @@
 package com.example.peopoolbe.global.jwt.api;
 
-import com.example.peopoolbe.global.jwt.dto.AccTokenResDto;
+import com.example.peopoolbe.global.jwt.api.dto.AccTokenResDto;
 import com.example.peopoolbe.global.jwt.service.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

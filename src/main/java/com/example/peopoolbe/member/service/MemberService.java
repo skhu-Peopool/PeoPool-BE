@@ -5,7 +5,7 @@ import com.example.peopoolbe.global.jwt.domain.repository.RefreshTokenRepository
 import com.example.peopoolbe.global.jwt.service.TokenProvider;
 import com.example.peopoolbe.member.api.dto.request.MemberLoginReq;
 import com.example.peopoolbe.member.api.dto.request.MemberSignUpReq;
-import com.example.peopoolbe.global.jwt.dto.TokenResDto;
+import com.example.peopoolbe.global.jwt.api.dto.TokenResDto;
 import com.example.peopoolbe.member.api.dto.response.UserInfo;
 import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.domain.repository.MemberRepository;
@@ -13,7 +13,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.Token;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

@@ -1,18 +1,21 @@
 package com.example.peopoolbe.member.domain;
 
+import com.example.peopoolbe.community.domain.Post;
 import com.example.peopoolbe.global.entity.BaseEntity;
-import com.example.peopoolbe.global.jwt.domain.RefreshToken;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor
 public class Member extends BaseEntity {
 
-    @Column(name = "USER_ID", nullable = false, unique = true)
+    @Column(name = "USER_CUSTOMID", nullable = false, unique = true)
     private String userId;
 
     @Column(name = "USER_PASSWORD", nullable = false)
@@ -31,16 +34,21 @@ public class Member extends BaseEntity {
     @Column(name = "USER_ROLE", nullable = false)
     private Role role;
 
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts = new ArrayList<>();
+
 //    @OneToOne
 //    @JoinColumn(name = "ID")
 //    private RefreshToken refreshToken;
 
     @Builder
-    public Member(String userId, String password, String name, String email) {
+    public Member(String userId, String password, String name, String email, String profileImage, List<Post> posts) {
         this.userId = userId;
         this.password = password;
         this.name = name;
         this.email = email;
         this.role = Role.ROLE_USER;
+        this.profileImage = profileImage;
+        this.posts = posts;
     }
 }

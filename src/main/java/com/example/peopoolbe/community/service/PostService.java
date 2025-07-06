@@ -8,14 +8,12 @@ import com.example.peopoolbe.community.domain.Post;
 import com.example.peopoolbe.community.domain.Status;
 import com.example.peopoolbe.community.domain.repository.PostRepository;
 import com.example.peopoolbe.member.domain.Member;
-import com.example.peopoolbe.member.domain.repository.MemberRepository;
 import com.example.peopoolbe.member.service.MemberService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -46,7 +44,7 @@ public class PostService {
                 .endDate(postAddReq.endDate())
                 .maxPeople(postAddReq.maxPeople())
                 .status(Status.RECRUITING)
-                .writerName(member.getName())
+                .writerName(member.getNickname())
                 .build();
     }
 
@@ -63,7 +61,7 @@ public class PostService {
                 .endDate(post.getRecruitmentEndDate())
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
-                .writerName(post.getMember().getName())
+                .writerName(post.getMember().getNickname())
                 .build();
     }
 
@@ -93,7 +91,7 @@ public class PostService {
                 .endDate(post.getRecruitmentEndDate())
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
-                .writerName(post.getMember().getName())
+                .writerName(post.getMember().getNickname())
                 .build();
     }
 
@@ -110,10 +108,9 @@ public class PostService {
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시물"));
     }
 
-    private boolean checkWriter(Member member, Post post) {
+    private void checkWriter(Member member, Post post) {
         if(!post.getMember().getId().equals(member.getId())) {
             throw new IllegalArgumentException("접근 권한 없음");
         }
-        return true;
     }
 }

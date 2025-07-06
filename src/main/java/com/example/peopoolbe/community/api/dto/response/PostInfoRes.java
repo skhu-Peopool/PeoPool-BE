@@ -24,7 +24,7 @@ public record PostInfoRes(
                 .endDate(post.getRecruitmentEndDate())
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
-                .writerName(post.getMember().getName())
+                .writerName(post.getMember().getNickname())
                 .build();
     }
 }

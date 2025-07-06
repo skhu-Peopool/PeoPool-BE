@@ -21,8 +21,8 @@ public class Member extends BaseEntity {
     @Column(name = "USER_PASSWORD", nullable = false)
     private String password;
 
-    @Column(name = "USER_NAME", nullable = false)
-    private String name;
+    @Column(name = "USER_NICKNAME", nullable = false)
+    private String nickname;
 
     @Column(name = "USER_EMAIL", nullable = false, unique = true)
     private String email;
@@ -42,10 +42,10 @@ public class Member extends BaseEntity {
 //    private RefreshToken refreshToken;
 
     @Builder
-    public Member(String userId, String password, String name, String email, String profileImage, List<Post> posts) {
+    public Member(String userId, String password, String nickname, String email, String profileImage, List<Post> posts) {
         this.userId = userId;
         this.password = password;
-        this.name = name;
+        this.nickname = nickname;
         this.email = email;
         this.role = Role.ROLE_USER;
         this.profileImage = profileImage;

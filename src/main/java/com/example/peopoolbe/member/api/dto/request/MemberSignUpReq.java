@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Email;
 public record MemberSignUpReq(
     String userId,
     String password,
-    String name,
+    String nickname,
     @Email String email
 ){
 }

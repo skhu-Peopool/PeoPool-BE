@@ -30,7 +30,7 @@ public class MemberService {
     public TokenResDto signUp(MemberSignUpReq memberSignUpReq) {
         Member member = memberRepository.save(Member.builder()
                 .userId(memberSignUpReq.userId())
-                .name(memberSignUpReq.name())
+                .nickname(memberSignUpReq.nickname())
                 .email(memberSignUpReq.email())
                 .password(passwordEncoder.encode(memberSignUpReq.password()))
                 .build());
@@ -73,7 +73,7 @@ public class MemberService {
 
         return UserInfo.builder()
                 .userId(member.getUserId())
-                .name(member.getName())
+                .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
                 .email(member.getEmail())
                 .build();

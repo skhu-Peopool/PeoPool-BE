@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +31,7 @@ public class MemberController {
             @ApiResponse(responseCode = "201", description = "가입 성공")
     })
     @PostMapping("/signup")
-    public ResponseEntity<TokenResDto> signUp(@RequestBody MemberSignUpReq memberSignUpReq) {
+    public ResponseEntity<TokenResDto> signUp(@RequestBody @Valid MemberSignUpReq memberSignUpReq) {
         return ResponseEntity.status(HttpStatus.CREATED).body(memberService.signUp(memberSignUpReq));
     }
 

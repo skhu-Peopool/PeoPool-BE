@@ -69,10 +69,7 @@ public class MemberService {
     }
 
     public UserInfo getUserInfo(Principal principal) {
-        Long userId = Long.parseLong(principal.getName());
-
-        Member member = memberRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+        Member member = getUserByToken(principal);
 
         return UserInfo.builder()
                 .userId(member.getUserId())
@@ -80,5 +77,12 @@ public class MemberService {
                 .profileImage(member.getProfileImage())
                 .email(member.getEmail())
                 .build();
+    }
+
+    public Member getUserByToken(Principal principal) {
+        Long userId = Long.parseLong(principal.getName());
+
+        return memberRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
     }
 }

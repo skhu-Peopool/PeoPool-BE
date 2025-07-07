@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -73,6 +75,36 @@ public class PostService {
                 .toList();
 
         return PostListRes.fromPostList(postInfoResList);
+    }
+
+    public PostListRes searchPost(String word) {
+        List<Post> postList = new ArrayList<>();
+        postList.addAll(searchPostByContent(word));
+        postList.addAll(searchPostByTitle(word));
+        postList.addAll(searchPostByWriterName(word));
+
+        HashSet<Post> postHashSet = new HashSet<>(postList);
+        postList.clear();
+        postList.addAll(postHashSet);
+        postList.sort((o1, o2) -> o2.getId().compareTo(o1.getId()));
+
+        List<PostInfoRes> postInfoResList = postList.stream()
+                .map(PostInfoRes::from)
+                .toList();
+
+        return PostListRes.fromPostList(postInfoResList);
+    }
+
+    private List<Post> searchPostByTitle(String title) {
+        return postRepository.findByTitleContainingOrderById(title);
+    }
+
+    private List<Post> searchPostByContent(String content) {
+        return postRepository.findByContentContainingOrderById(content);
+    }
+
+    private List<Post> searchPostByWriterName(String writerName) {
+        return postRepository.findByMember_NicknameContainingOrderById(writerName);
     }
 
     public PostInfoRes updatePost(Long postId, PostUpdateReq postUpdateReq, Principal principal) {

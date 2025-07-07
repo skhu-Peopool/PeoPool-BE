@@ -32,6 +32,11 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostList());
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<PostListRes> searchPost(@RequestParam String query) {
+        return ResponseEntity.ok(postService.searchPost(query));
+    }
+
     @PatchMapping("/update/{postId}")
     public ResponseEntity<PostInfoRes> updatePost(@PathVariable Long postId, @RequestBody PostUpdateReq postUpdateReq, Principal principal) {
         return ResponseEntity.ok(postService.updatePost(postId, postUpdateReq, principal));

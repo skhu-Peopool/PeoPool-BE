@@ -9,6 +9,7 @@ import com.example.peopoolbe.member.api.dto.request.MemberSignUpReq;
 import com.example.peopoolbe.global.jwt.api.dto.TokenResDto;
 import com.example.peopoolbe.member.api.dto.response.UserInfo;
 import com.example.peopoolbe.member.domain.Member;
+import com.example.peopoolbe.member.domain.ProfileVisible;
 import com.example.peopoolbe.member.domain.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
@@ -35,7 +36,7 @@ public class MemberService {
                 .email(memberSignUpReq.email())
                 .password(passwordEncoder.encode(memberSignUpReq.password()))
                 .profileImage("")
-                .isProfileVisible(false)
+                .profileVisible(ProfileVisible.INVISIBLE)
                 .build());
 
         return tokenProvider.createToken(member);
@@ -79,14 +80,15 @@ public class MemberService {
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
                 .email(member.getEmail())
-                .isProfileVisible(member.getIsProfileVisible())
+                .profileVisible(member.getProfileVisible())
                 .build();
     }
 
     public UserInfo updateUserInfo(Principal principal, MemberProfileUpdateReq memberProfileUpdateReq) {
         Member member = getUserByToken(principal);
 
-        member.update(memberProfileUpdateReq.password(), memberProfileUpdateReq.nickname(), memberProfileUpdateReq.profileImage(), memberProfileUpdateReq.isProfileVisible());
+        member.update(memberProfileUpdateReq.password(), memberProfileUpdateReq.nickname(), memberProfileUpdateReq.profileImage(), memberProfileUpdateReq.profileVisible());
+        System.out.println(member.getNickname());
         memberRepository.save(member);
 
         return UserInfo.builder()
@@ -94,7 +96,7 @@ public class MemberService {
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
                 .email(member.getEmail())
-                .isProfileVisible(member.getIsProfileVisible())
+                .profileVisible(member.getProfileVisible())
                 .build();
     }
 

@@ -52,7 +52,7 @@ public class MemberController {
     }
 
     @PatchMapping("/update")
-    public ResponseEntity<UserInfo> updateUserInfo(Principal principal, MemberProfileUpdateReq memberProfileUpdateReq) {
+    public ResponseEntity<UserInfo> updateUserInfo(Principal principal, @RequestBody MemberProfileUpdateReq memberProfileUpdateReq) {
         return ResponseEntity.ok(memberService.updateUserInfo(principal, memberProfileUpdateReq));
     }
 }

@@ -87,8 +87,11 @@ public class MemberService {
     public UserInfo updateUserInfo(Principal principal, MemberProfileUpdateReq memberProfileUpdateReq) {
         Member member = getUserByToken(principal);
 
-        member.update(memberProfileUpdateReq.password(), memberProfileUpdateReq.nickname(), memberProfileUpdateReq.profileImage(), memberProfileUpdateReq.profileVisible());
-        System.out.println(member.getNickname());
+        member.update(passwordEncoder.encode(memberProfileUpdateReq.password()),
+                memberProfileUpdateReq.nickname(),
+                memberProfileUpdateReq.profileImage(),
+                memberProfileUpdateReq.profileVisible());
+
         memberRepository.save(member);
 
         return UserInfo.builder()

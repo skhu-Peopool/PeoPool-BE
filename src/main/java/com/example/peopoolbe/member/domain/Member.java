@@ -38,14 +38,14 @@ public class Member extends BaseEntity {
     private List<Post> posts = new ArrayList<>();
 
     @Column(nullable = false)
-    private boolean isProfileVisible;
+    private Boolean isProfileVisible;
 
 //    @OneToOne
 //    @JoinColumn(name = "ID")
 //    private RefreshToken refreshToken;
 
     @Builder
-    public Member(String userId, String password, String nickname, String email, String profileImage, List<Post> posts, boolean isProfileVisible) {
+    public Member(String userId, String password, String nickname, String email, String profileImage, List<Post> posts, Boolean isProfileVisible) {
         this.userId = userId;
         this.password = password;
         this.nickname = nickname;
@@ -53,6 +53,13 @@ public class Member extends BaseEntity {
         this.role = Role.ROLE_USER;
         this.profileImage = profileImage;
         this.posts = posts;
+        this.isProfileVisible = isProfileVisible;
+    }
+
+    public void update(String password, String nickname, String profileImage, Boolean isProfileVisible) {
+        this.password = password;
+        this.nickname = nickname;
+        this.profileImage = profileImage;
         this.isProfileVisible = isProfileVisible;
     }
 }

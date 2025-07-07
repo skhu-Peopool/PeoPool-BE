@@ -1,6 +1,7 @@
 package com.example.peopoolbe.member.api;
 
 import com.example.peopoolbe.member.api.dto.request.MemberLoginReq;
+import com.example.peopoolbe.member.api.dto.request.MemberProfileUpdateReq;
 import com.example.peopoolbe.member.api.dto.request.MemberSignUpReq;
 import com.example.peopoolbe.global.jwt.api.dto.TokenResDto;
 import com.example.peopoolbe.member.api.dto.response.UserInfo;
@@ -13,10 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -51,5 +49,10 @@ public class MemberController {
     @GetMapping("/user")
     public ResponseEntity<UserInfo> getUserInfo(Principal principal) {
         return ResponseEntity.ok(memberService.getUserInfo(principal));
+    }
+
+    @PatchMapping("/update")
+    public ResponseEntity<UserInfo> updateUserInfo(Principal principal, MemberProfileUpdateReq memberProfileUpdateReq) {
+        return ResponseEntity.ok(memberService.updateUserInfo(principal, memberProfileUpdateReq));
     }
 }

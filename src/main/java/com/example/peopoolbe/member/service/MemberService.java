@@ -4,6 +4,7 @@ import com.example.peopoolbe.global.jwt.domain.RefreshToken;
 import com.example.peopoolbe.global.jwt.domain.repository.RefreshTokenRepository;
 import com.example.peopoolbe.global.jwt.service.TokenProvider;
 import com.example.peopoolbe.member.api.dto.request.MemberLoginReq;
+import com.example.peopoolbe.member.api.dto.request.MemberProfileUpdateReq;
 import com.example.peopoolbe.member.api.dto.request.MemberSignUpReq;
 import com.example.peopoolbe.global.jwt.api.dto.TokenResDto;
 import com.example.peopoolbe.member.api.dto.response.UserInfo;
@@ -78,11 +79,23 @@ public class MemberService {
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
                 .email(member.getEmail())
+                .isProfileVisible(member.getIsProfileVisible())
                 .build();
     }
 
-    public UserInfo updateUserInfo(Principal principal) {
+    public UserInfo updateUserInfo(Principal principal, MemberProfileUpdateReq memberProfileUpdateReq) {
+        Member member = getUserByToken(principal);
 
+        member.update(memberProfileUpdateReq.password(), memberProfileUpdateReq.nickname(), memberProfileUpdateReq.profileImage(), memberProfileUpdateReq.isProfileVisible());
+        memberRepository.save(member);
+
+        return UserInfo.builder()
+                .userId(member.getUserId())
+                .nickname(member.getNickname())
+                .profileImage(member.getProfileImage())
+                .email(member.getEmail())
+                .isProfileVisible(member.getIsProfileVisible())
+                .build();
     }
 
     public Member getUserByToken(Principal principal) {

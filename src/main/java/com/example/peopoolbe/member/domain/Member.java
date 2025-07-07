@@ -37,12 +37,15 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
 
+    @Column(nullable = false)
+    private boolean isProfileVisible;
+
 //    @OneToOne
 //    @JoinColumn(name = "ID")
 //    private RefreshToken refreshToken;
 
     @Builder
-    public Member(String userId, String password, String nickname, String email, String profileImage, List<Post> posts) {
+    public Member(String userId, String password, String nickname, String email, String profileImage, List<Post> posts, boolean isProfileVisible) {
         this.userId = userId;
         this.password = password;
         this.nickname = nickname;
@@ -50,5 +53,6 @@ public class Member extends BaseEntity {
         this.role = Role.ROLE_USER;
         this.profileImage = profileImage;
         this.posts = posts;
+        this.isProfileVisible = isProfileVisible;
     }
 }

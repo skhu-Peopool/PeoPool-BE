@@ -7,6 +7,7 @@ public record UserInfo(
         String userId,
         String nickname,
         String profileImage,
-        String email
+        String email,
+        boolean isProfileVisible
 ){
 }

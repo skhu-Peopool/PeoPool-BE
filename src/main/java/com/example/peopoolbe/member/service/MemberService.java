@@ -33,6 +33,8 @@ public class MemberService {
                 .nickname(memberSignUpReq.nickname())
                 .email(memberSignUpReq.email())
                 .password(passwordEncoder.encode(memberSignUpReq.password()))
+                .profileImage("")
+                .isProfileVisible(false)
                 .build());
 
         return tokenProvider.createToken(member);
@@ -77,6 +79,10 @@ public class MemberService {
                 .profileImage(member.getProfileImage())
                 .email(member.getEmail())
                 .build();
+    }
+
+    public UserInfo updateUserInfo(Principal principal) {
+
     }
 
     public Member getUserByToken(Principal principal) {

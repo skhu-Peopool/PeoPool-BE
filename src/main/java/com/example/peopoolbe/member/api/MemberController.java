@@ -29,8 +29,8 @@ public class MemberController {
             @ApiResponse(responseCode = "201", description = "가입 성공")
     })
     @PostMapping("/signup")
-    public ResponseEntity<TokenResDto> signUp(@RequestBody @Valid MemberSignUpReq memberSignUpReq) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(memberService.signUp(memberSignUpReq));
+    public ResponseEntity<TokenResDto> signUp(@RequestBody @Valid MemberSignUpReq memberSignUpReq, HttpServletResponse response) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberService.signUp(memberSignUpReq, response));
     }
 
     @Operation(summary = "로그인", description = "유저 id, password를 입력하여 로그인")

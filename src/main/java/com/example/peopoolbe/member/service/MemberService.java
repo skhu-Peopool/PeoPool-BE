@@ -29,7 +29,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public TokenResDto signUp(MemberSignUpReq memberSignUpReq) {
+    public TokenResDto signUp(MemberSignUpReq memberSignUpReq, HttpServletResponse response) {
         Member member = memberRepository.save(Member.builder()
                 .userId(memberSignUpReq.userId())
                 .nickname(memberSignUpReq.nickname())
@@ -39,7 +39,11 @@ public class MemberService {
                 .profileVisible(ProfileVisible.INVISIBLE)
                 .build());
 
-        return tokenProvider.createToken(member);
+        TokenResDto tokenResDto = tokenProvider.createToken(member);
+
+        addRefreshTokenInCookie(tokenResDto, response);
+
+        return tokenResDto;
     }
 
     public TokenResDto login(MemberLoginReq memberLoginReq, HttpServletResponse response) {
@@ -60,16 +64,20 @@ public class MemberService {
 //        accessCookie.setSecure(true);
 //        accessCookie.setMaxAge(60 * 15); // 15분
 
+        addRefreshTokenInCookie(tokenResDto, response);
+
+        return tokenResDto;
+    }
+
+    public void addRefreshTokenInCookie(TokenResDto tokenResDto, HttpServletResponse response) {
         Cookie refreshCookie = new Cookie("refreshToken", tokenResDto.refreshToken());
+        refreshCookie.setPath("/");
         refreshCookie.setPath("/");
         refreshCookie.setHttpOnly(true);
         refreshCookie.setSecure(true);
         refreshCookie.setMaxAge(60 * 60 * 24 * 14); // 2주
 
-//        response.addCookie(accessCookie);
         response.addCookie(refreshCookie);
-
-        return tokenResDto;
     }
 
     public UserInfo getUserInfo(Principal principal) {

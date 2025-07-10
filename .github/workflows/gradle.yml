@@ -51,6 +51,6 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /home/park/PeoPool
-            docker build -t peopool-backend:latest .
+            docker build -t peopool-backend:latest -f PeoPool-BE/Dockerfile PeoPool-BE
             docker-compose up -d backend
             docker image prune -f

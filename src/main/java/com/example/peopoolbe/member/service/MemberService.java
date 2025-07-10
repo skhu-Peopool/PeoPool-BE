@@ -15,7 +15,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -71,15 +70,15 @@ public class MemberService {
     }
 
     public void addRefreshTokenInCookie(TokenResDto tokenResDto, HttpServletResponse response) {
-        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", tokenResDto.refreshToken())
-                .path("/")                       // 모든 경로에 쿠키 적용
-                .httpOnly(true)                  // JS 접근 불가
-                .secure(true)                    // HTTPS 요청만 허용
-                .sameSite("None")                // 크로스도메인 허용
-                .maxAge(60 * 60 * 24 * 14)       // 2주
-                .build();
+        Cookie refreshCookie = new Cookie("refreshToken", tokenResDto.refreshToken());
+        refreshCookie.setPath("/");
+        refreshCookie.setPath("/");
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(true);
+        refreshCookie.setAttribute("SameSite", "None");
+        refreshCookie.setMaxAge(60 * 60 * 24 * 14); // 2주
 
-        response.addHeader("Set-Cookie", refreshCookie.toString());
+        response.addCookie(refreshCookie);
     }
 
     public UserInfo getUserInfo(Principal principal) {

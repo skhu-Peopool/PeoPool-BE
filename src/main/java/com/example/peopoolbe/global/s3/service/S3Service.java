@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.Principal;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +38,8 @@ public class S3Service {
             return null;
         }
         Member member = memberService.getUserByToken(principal);
+        String formerFileName = extractFormerFileName(member);
+        System.out.println(formerFileName);
 
         String fileName = createFileName(multipartFile.getOriginalFilename());
 
@@ -55,10 +59,25 @@ public class S3Service {
         member.updateImage(url);
         memberRepository.save(member);
 
+        deleteImage(formerFileName);
+
         return S3ImageUploadRes.builder()
                 .fileName(fileName)
                 .fileUrl(url)
                 .build();
+    }
+
+    private String extractFormerFileName(Member member) {
+        String formerFileUrl = member.getProfileImage();
+
+        String regex = "([^/]+\\.jpg)$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(formerFileUrl);
+
+        if(matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
     }
 
     private String createFileName(String fileName) {
@@ -71,5 +90,11 @@ public class S3Service {
         } catch (StringIndexOutOfBoundsException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일(" + fileName + ").");
         }
+    }
+
+    private void deleteImage(String fileName) {
+        if(fileName == null || fileName.isEmpty() || fileName.equals("default.png"))
+            return;
+        amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
     }
 }

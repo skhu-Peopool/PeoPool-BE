@@ -80,6 +80,11 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "프로필사진 업로드", description = "유저의 프로필사진 업로드, 수정")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "사진 수정 성공"),
+            @ApiResponse(responseCode = "500", description = "Multipartfile 형식의 사진을 주지 않았을 확률이 매우 높음")
+    })
     @PostMapping("/image")
     public ResponseEntity<S3ImageUploadRes> uploadImage(Principal principal, MultipartFile file) {
         return ResponseEntity.ok(s3Service.uploadImage(principal, file));

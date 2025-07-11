@@ -61,14 +61,17 @@ public class Member extends BaseEntity {
         this.profileVisible = profileVisible;
     }
 
-    public void update(String password, String nickname, String profileImage, ProfileVisible profileVisible) {
+    public void update(String password, String nickname, ProfileVisible profileVisible) {
         this.password = password;
         this.nickname = nickname;
-        this.profileImage = profileImage;
         this.profileVisible = profileVisible;
     }
 
     public void addRefreshToken(RefreshToken refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public void updateImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 }

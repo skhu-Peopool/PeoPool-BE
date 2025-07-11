@@ -3,6 +3,7 @@ package com.example.peopoolbe.member.service;
 import com.example.peopoolbe.global.jwt.domain.RefreshToken;
 import com.example.peopoolbe.global.jwt.domain.repository.RefreshTokenRepository;
 import com.example.peopoolbe.global.jwt.service.TokenProvider;
+import com.example.peopoolbe.global.s3.dto.S3ImageUploadRes;
 import com.example.peopoolbe.member.api.dto.request.MemberLoginReq;
 import com.example.peopoolbe.member.api.dto.request.MemberProfileUpdateReq;
 import com.example.peopoolbe.member.api.dto.request.MemberSignUpReq;
@@ -16,9 +17,11 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 
@@ -31,13 +34,20 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
 
+    @Value("${cloud.aws.region.static}")
+    private String region;
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
+
     public TokenResDto signUp(MemberSignUpReq memberSignUpReq, HttpServletResponse response) {
+        String defaultImage = "https://" + bucket + ".s3." + region + ".amazonaws.com/default.png";
         Member member = Member.builder()
                 .userId(memberSignUpReq.userId())
                 .nickname(memberSignUpReq.nickname())
                 .email(memberSignUpReq.email())
                 .password(passwordEncoder.encode(memberSignUpReq.password()))
-                .profileImage("")
+                .profileImage(defaultImage)
                 .profileVisible(ProfileVisible.INVISIBLE)
                 .build();
         memberRepository.save(member);
@@ -101,7 +111,6 @@ public class MemberService {
 
         member.update(passwordEncoder.encode(memberProfileUpdateReq.password()),
                 memberProfileUpdateReq.nickname(),
-                memberProfileUpdateReq.profileImage(),
                 memberProfileUpdateReq.profileVisible());
 
         memberRepository.save(member);

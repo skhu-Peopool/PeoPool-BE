@@ -1,5 +1,7 @@
 package com.example.peopoolbe.member.api;
 
+import com.example.peopoolbe.global.s3.dto.S3ImageUploadRes;
+import com.example.peopoolbe.global.s3.service.S3Service;
 import com.example.peopoolbe.member.api.dto.request.MemberLoginReq;
 import com.example.peopoolbe.member.api.dto.request.MemberProfileUpdateReq;
 import com.example.peopoolbe.member.api.dto.request.MemberSignUpReq;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 
@@ -25,6 +28,7 @@ import java.security.Principal;
 public class MemberController {
 
     private final MemberService memberService;
+    private final S3Service s3Service;
 
     @Operation(summary = "회원가입", description = "자체로그인을 통한 유저 가입")
     @ApiResponses({
@@ -74,5 +78,10 @@ public class MemberController {
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         memberService.logout(request, response);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/image")
+    public ResponseEntity<S3ImageUploadRes> uploadImage(Principal principal, MultipartFile file) {
+        return ResponseEntity.ok(s3Service.uploadImage(principal, file));
     }
 }

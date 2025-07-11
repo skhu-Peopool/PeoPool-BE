@@ -46,18 +46,30 @@ public class MemberController {
 
     @Operation(summary = "유저 정보 확인", description = "토큰을 통한 유저 정보 확인")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "로그인 성공")
+            @ApiResponse(responseCode = "200", description = "로그인 성공"),
+            @ApiResponse(responseCode = "403", description = "엑세스토큰 없음")
     })
     @GetMapping("/user")
     public ResponseEntity<UserInfo> getUserInfo(Principal principal) {
         return ResponseEntity.ok(memberService.getUserInfo(principal));
     }
 
+    @Operation(summary = "유저 정보 수정", description = "암호, 이름, 프로필사진, 공개여부 수정")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "403", description = "엑세스토큰 없음"),
+            @ApiResponse(responseCode = "500", description = "뭔가 하나 안넣음")
+    })
     @PatchMapping("/update")
     public ResponseEntity<UserInfo> updateUserInfo(Principal principal, @RequestBody MemberProfileUpdateReq memberProfileUpdateReq) {
         return ResponseEntity.ok(memberService.updateUserInfo(principal, memberProfileUpdateReq));
     }
 
+    @Operation(summary = "로그아웃", description = "유저 로그아웃")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "로그아웃 성공"),
+            @ApiResponse(responseCode = "403", description = "엑세스토큰 없음")
+    })
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         memberService.logout(request, response);

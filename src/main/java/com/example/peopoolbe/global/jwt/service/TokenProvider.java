@@ -56,7 +56,7 @@ public class TokenProvider {
                 .build();
     }
 
-    public TokenResDto refreshToken(String refreshToken) {
+    public TokenResDto reissueTokens(String refreshToken) {
         String accessToken = accessTokenReIssue(refreshToken).accessToken();
 
         return TokenResDto.builder()
@@ -89,6 +89,7 @@ public class TokenProvider {
 
         refreshTokenRepository.save(RefreshToken.builder()
                 .refreshToken(refreshToken)
+                .member(member)
                 .build());
 
         return refreshToken;

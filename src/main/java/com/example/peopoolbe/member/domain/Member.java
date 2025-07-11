@@ -2,6 +2,7 @@ package com.example.peopoolbe.member.domain;
 
 import com.example.peopoolbe.community.domain.Post;
 import com.example.peopoolbe.global.entity.BaseEntity;
+import com.example.peopoolbe.global.jwt.domain.RefreshToken;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,9 +42,12 @@ public class Member extends BaseEntity {
     @Column(name = "USER_PROFILE_VISIBLE", nullable = false)
     private ProfileVisible profileVisible;
 
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private RefreshToken refreshToken;
+
 //    @OneToOne
 //    @JoinColumn(name = "ID")
-//    private RefreshToken refreshToken;
+//    private RefreshToken reissueTokens;
 
     @Builder
     public Member(String userId, String password, String nickname, String email, String profileImage, List<Post> posts, ProfileVisible profileVisible) {
@@ -62,5 +66,9 @@ public class Member extends BaseEntity {
         this.nickname = nickname;
         this.profileImage = profileImage;
         this.profileVisible = profileVisible;
+    }
+
+    public void addRefreshToken(RefreshToken refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }

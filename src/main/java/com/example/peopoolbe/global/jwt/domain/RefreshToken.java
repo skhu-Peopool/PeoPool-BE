@@ -15,9 +15,14 @@ public class RefreshToken extends BaseEntity {
     @Column(name = "REFRESH_TOKEN")
     private String refreshToken;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     @Builder
-    public RefreshToken(String refreshToken) {
+    public RefreshToken(String refreshToken, Member member) {
         this.refreshToken = refreshToken;
+        this.member = member;
     }
 
     public void update(String refreshToken) {

@@ -9,6 +9,8 @@ import com.example.peopoolbe.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -54,5 +56,11 @@ public class MemberController {
     @PatchMapping("/update")
     public ResponseEntity<UserInfo> updateUserInfo(Principal principal, @RequestBody MemberProfileUpdateReq memberProfileUpdateReq) {
         return ResponseEntity.ok(memberService.updateUserInfo(principal, memberProfileUpdateReq));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        memberService.logout(request, response);
+        return ResponseEntity.ok().build();
     }
 }

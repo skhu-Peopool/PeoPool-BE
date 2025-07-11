@@ -13,10 +13,12 @@ import com.example.peopoolbe.member.domain.ProfileVisible;
 import com.example.peopoolbe.member.domain.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 
@@ -30,16 +32,18 @@ public class MemberService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     public TokenResDto signUp(MemberSignUpReq memberSignUpReq, HttpServletResponse response) {
-        Member member = memberRepository.save(Member.builder()
+        Member member = Member.builder()
                 .userId(memberSignUpReq.userId())
                 .nickname(memberSignUpReq.nickname())
                 .email(memberSignUpReq.email())
                 .password(passwordEncoder.encode(memberSignUpReq.password()))
                 .profileImage("")
                 .profileVisible(ProfileVisible.INVISIBLE)
-                .build());
+                .build();
+        memberRepository.save(member);
 
         TokenResDto tokenResDto = tokenProvider.createToken(member);
+        member.addRefreshToken(refreshTokenRepository.findByRefreshToken(tokenResDto.refreshToken()));
 
         addRefreshTokenInCookie(tokenResDto, response);
 
@@ -53,10 +57,9 @@ public class MemberService {
         if (!passwordEncoder.matches(memberLoginReq.password(), member.getPassword()))
             throw new RuntimeException("비밀번호 불일치");
 
-        RefreshToken refreshToken = refreshTokenRepository.findById(member.getId())
-                .orElseThrow(() -> new EntityNotFoundException("리프레쉬 토큰 없음"));
+        TokenResDto tokenResDto = tokenProvider.createToken(member);
 
-        TokenResDto tokenResDto = tokenProvider.refreshToken(refreshToken.getRefreshToken());
+        member.addRefreshToken(refreshTokenRepository.findByRefreshToken(tokenResDto.refreshToken()));
 
 //        Cookie accessCookie = new Cookie("accessToken", tokenProvider.createToken(member).accessToken());
 //        accessCookie.setPath("/");
@@ -117,5 +120,34 @@ public class MemberService {
 
         return memberRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+    }
+
+    @Transactional
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+//        Member member = getUserByToken(principal);
+//        member.addRefreshToken(null);
+//
+        String refreshToken = null;
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refreshToken".equals(cookie.getName())) {
+                    refreshToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        refreshTokenRepository.deleteByRefreshToken(refreshToken);
+
+        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(0);
+        response.addCookie(refreshCookie);
+
+        Cookie refreshCookie1 = new Cookie("refreshCookie", refreshToken);
+        refreshCookie1.setPath("/");
+        refreshCookie1.setMaxAge(0);
+        response.addCookie(refreshCookie1);
     }
 }

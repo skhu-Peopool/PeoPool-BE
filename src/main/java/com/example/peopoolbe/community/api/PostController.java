@@ -27,7 +27,7 @@ public class PostController {
             @ApiResponse(responseCode = "403", description = "엑세스토큰 없음")
     })
     @PostMapping("/add")
-    public ResponseEntity<PostInfoRes> addPost(@RequestBody PostAddReq postAddReq, Principal principal) {
+    public ResponseEntity<PostInfoRes> addPost(Principal principal, @RequestBody PostAddReq postAddReq) {
         return ResponseEntity.status(HttpStatus.CREATED).body(postService.addPost(postAddReq, principal));
     }
 
@@ -37,7 +37,7 @@ public class PostController {
             @ApiResponse(responseCode = "403", description = "엑세스토큰 없음")
     })
     @GetMapping("/{postId}")
-    public ResponseEntity<PostInfoRes> getPost(@PathVariable Long postId, Principal principal) {
+    public ResponseEntity<PostInfoRes> getPost(Principal principal, @PathVariable Long postId) {
         return ResponseEntity.ok(postService.getPostInfo(postId, principal));
     }
 
@@ -67,7 +67,7 @@ public class PostController {
             @ApiResponse(responseCode = "500", description = "수정 권한 없음")
     })
     @PatchMapping("/update/{postId}")
-    public ResponseEntity<PostInfoRes> updatePost(@PathVariable Long postId, @RequestBody PostUpdateReq postUpdateReq, Principal principal) {
+    public ResponseEntity<PostInfoRes> updatePost(Principal principal, @PathVariable Long postId, @RequestBody PostUpdateReq postUpdateReq) {
         return ResponseEntity.ok(postService.updatePost(postId, postUpdateReq, principal));
     }
 
@@ -78,7 +78,7 @@ public class PostController {
             @ApiResponse(responseCode = "500", description = "삭제 권한 없음")
     })
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long postId, Principal principal) {
+    public ResponseEntity<Void> deletePost(Principal principal, @PathVariable Long postId) {
         postService.deletePost(postId, principal);
 
         return ResponseEntity.ok().build();

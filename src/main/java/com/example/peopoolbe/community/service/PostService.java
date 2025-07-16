@@ -11,6 +11,9 @@ import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.service.MemberService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -67,8 +70,11 @@ public class PostService {
                 .build();
     }
 
-    public PostListRes getPostList() {
-        List<Post> postList = postRepository.findAll();
+    public PostListRes getPostList(int page, int size) {
+        Pageable pageable = PageRequest.of(page-1, size);
+        Page<Post> postPage = postRepository.findAll(pageable);
+
+        List<Post> postList = postPage.getContent();
 
         List<PostInfoRes> postInfoResList = postList.stream()
                 .map(PostInfoRes::from)

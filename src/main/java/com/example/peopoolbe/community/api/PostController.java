@@ -46,8 +46,9 @@ public class PostController {
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
     @GetMapping("/list")
-    public ResponseEntity<PostListRes> getPostList() {
-        return ResponseEntity.ok(postService.getPostList());
+    public ResponseEntity<PostListRes> getPostList(@RequestParam(defaultValue = "1") int page,
+                                                   @RequestParam(defaultValue = "6") int size) {
+        return ResponseEntity.ok(postService.getPostList(page, size));
     }
 
     @Operation(summary = "게시물 검색", description = "제목, 본문, 작성자를 검색하여 게시물 조회")

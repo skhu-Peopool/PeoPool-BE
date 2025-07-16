@@ -57,8 +57,10 @@ public class PostController {
             @ApiResponse(responseCode = "403", description = "엑세스토큰 없음")
     })
     @GetMapping("/search")
-    public ResponseEntity<PostListRes> searchPost(@RequestParam String query) {
-        return ResponseEntity.ok(postService.searchPost(query));
+    public ResponseEntity<PostListRes> searchPost(@RequestParam String query,
+                                                  @RequestParam(defaultValue = "1") int page,
+                                                  @RequestParam(defaultValue = "6") int size) {
+        return ResponseEntity.ok(postService.searchPost(query, page, size));
     }
 
     @Operation(summary = "게시물 수정", description = "본인이 작성한 게시물 수정")

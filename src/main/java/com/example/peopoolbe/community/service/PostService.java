@@ -17,8 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -83,34 +81,17 @@ public class PostService {
         return PostListRes.fromPostList(postInfoResList);
     }
 
-    public PostListRes searchPost(String word) {
-        List<Post> postList = new ArrayList<>();
-        postList.addAll(searchPostByContent(word));
-        postList.addAll(searchPostByTitle(word));
-        postList.addAll(searchPostByWriterName(word));
+    public PostListRes searchPost(String word, int page, int size) {
+        Pageable pageable = PageRequest.of(page-1, size);
+        Page<Post> postPage = postRepository.findByTitleContainingOrContentContainingOrMember_NicknameContainingOrderById(pageable, word, word, word);
 
-        HashSet<Post> postHashSet = new HashSet<>(postList);
-        postList.clear();
-        postList.addAll(postHashSet);
-        postList.sort((o1, o2) -> o2.getId().compareTo(o1.getId()));
+        List<Post> postList = postPage.getContent();
 
         List<PostInfoRes> postInfoResList = postList.stream()
                 .map(PostInfoRes::from)
                 .toList();
 
         return PostListRes.fromPostList(postInfoResList);
-    }
-
-    private List<Post> searchPostByTitle(String title) {
-        return postRepository.findByTitleContainingOrderById(title);
-    }
-
-    private List<Post> searchPostByContent(String content) {
-        return postRepository.findByContentContainingOrderById(content);
-    }
-
-    private List<Post> searchPostByWriterName(String writerName) {
-        return postRepository.findByMember_NicknameContainingOrderById(writerName);
     }
 
     public PostInfoRes updatePost(Long postId, PostUpdateReq postUpdateReq, Principal principal) {

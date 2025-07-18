@@ -41,7 +41,7 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostInfo(postId));
     }
 
-    @Operation(summary = "게시물 리스트 조회", description = "게시물 리스트를 조회, 토큰이 불필요")
+    @Operation(summary = "게시물 리스트 조회", description = "게시물 리스트를 조회, 토큰이 불필요, 페이지는 1부터 시작")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공")
     })
@@ -51,7 +51,7 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostList(page, size));
     }
 
-    @Operation(summary = "게시물 검색", description = "제목, 본문, 작성자를 검색하여 게시물 조회")
+    @Operation(summary = "게시물 검색", description = "제목, 본문, 작성자를 검색하여 게시물 조회, 페이지는 1부터 시작")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "403", description = "엑세스토큰 없음")

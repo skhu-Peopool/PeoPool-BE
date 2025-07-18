@@ -51,11 +51,8 @@ public class PostService {
                 .build();
     }
 
-    public PostInfoRes getPostInfo(Long postId, Principal principal) {
-        Member member = memberService.getUserByToken(principal);
+    public PostInfoRes getPostInfo(Long postId) {
         Post post = getPostByPostId(postId);
-
-        checkWriter(member, post);
 
         return PostInfoRes.builder()
                 .id(postId)

@@ -37,8 +37,8 @@ public class PostController {
             @ApiResponse(responseCode = "403", description = "엑세스토큰 없음")
     })
     @GetMapping("/{postId}")
-    public ResponseEntity<PostInfoRes> getPost(Principal principal, @PathVariable Long postId) {
-        return ResponseEntity.ok(postService.getPostInfo(postId, principal));
+    public ResponseEntity<PostInfoRes> getPost(@PathVariable Long postId) {
+        return ResponseEntity.ok(postService.getPostInfo(postId));
     }
 
     @Operation(summary = "게시물 리스트 조회", description = "게시물 리스트를 조회, 토큰이 불필요")

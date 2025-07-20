@@ -43,7 +43,6 @@ public class MemberService {
     public TokenResDto signUp(MemberSignUpReq memberSignUpReq, HttpServletResponse response) {
         String defaultImage = "https://" + bucket + ".s3." + region + ".amazonaws.com/default.png";
         Member member = Member.builder()
-                .userId(memberSignUpReq.userId())
                 .nickname(memberSignUpReq.nickname())
                 .email(memberSignUpReq.email())
                 .password(passwordEncoder.encode(memberSignUpReq.password()))
@@ -61,7 +60,7 @@ public class MemberService {
     }
 
     public TokenResDto login(MemberLoginReq memberLoginReq, HttpServletResponse response) {
-        Member member = memberRepository.findByUserId(memberLoginReq.id())
+        Member member = memberRepository.findByEmail(memberLoginReq.email())
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 멤버"));
 
         if (!passwordEncoder.matches(memberLoginReq.password(), member.getPassword()))
@@ -98,7 +97,6 @@ public class MemberService {
         Member member = getUserByToken(principal);
 
         return UserInfo.builder()
-                .userId(member.getUserId())
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
                 .email(member.getEmail())
@@ -116,7 +114,6 @@ public class MemberService {
         memberRepository.save(member);
 
         return UserInfo.builder()
-                .userId(member.getUserId())
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
                 .email(member.getEmail())

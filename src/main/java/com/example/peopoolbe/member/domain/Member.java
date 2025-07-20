@@ -16,13 +16,10 @@ import java.util.List;
 @NoArgsConstructor
 public class Member extends BaseEntity {
 
-    @Column(name = "USER_CUSTOMID", nullable = false, unique = true)
-    private String userId;
-
     @Column(name = "USER_PASSWORD", nullable = false)
     private String password;
 
-    @Column(name = "USER_NICKNAME", nullable = false)
+    @Column(name = "USER_NICKNAME", nullable = false, unique = true)
     private String nickname;
 
     @Column(name = "USER_EMAIL", nullable = false, unique = true)
@@ -50,8 +47,7 @@ public class Member extends BaseEntity {
 //    private RefreshToken reissueTokens;
 
     @Builder
-    public Member(String userId, String password, String nickname, String email, String profileImage, List<Post> posts, ProfileVisible profileVisible) {
-        this.userId = userId;
+    public Member(String password, String nickname, String email, String profileImage, List<Post> posts, ProfileVisible profileVisible) {
         this.password = password;
         this.nickname = nickname;
         this.email = email;

@@ -1,7 +1,9 @@
 package com.example.peopoolbe.member.api.dto.request;
 
+import jakarta.validation.constraints.Email;
+
 public record MemberLoginReq(
-        String id,
+        @Email String email,
         String password
 ) {
 }

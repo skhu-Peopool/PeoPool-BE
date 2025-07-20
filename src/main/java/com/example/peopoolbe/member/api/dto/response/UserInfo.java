@@ -6,7 +6,6 @@ import lombok.Builder;
 
 @Builder
 public record UserInfo(
-        String userId,
         String nickname,
         String profileImage,
         String email,
@@ -14,7 +13,6 @@ public record UserInfo(
 ){
     public static UserInfo from(Member member) {
         return UserInfo.builder()
-                .userId(member.getUserId())
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
                 .email(member.getEmail())

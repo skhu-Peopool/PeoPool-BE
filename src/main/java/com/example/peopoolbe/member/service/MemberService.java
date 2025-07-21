@@ -106,7 +106,9 @@ public class MemberService {
         Member member = getUserByToken(principal);
 
         member.updateProfile(memberProfileUpdateReq.nickname(),
-                memberProfileUpdateReq.viewStatus());
+                memberProfileUpdateReq.profileVisible(),
+                memberProfileUpdateReq.activityVisible(),
+                memberProfileUpdateReq.postVisible());
 
         memberRepository.save(member);
 

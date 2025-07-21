@@ -37,7 +37,7 @@ public class Member extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "USER_PROFILE_VISIBLE", nullable = false)
-    private ProfileVisible profileVisible;
+    private ViewStatus profileVisible;
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private RefreshToken refreshToken;
@@ -47,7 +47,7 @@ public class Member extends BaseEntity {
 //    private RefreshToken reissueTokens;
 
     @Builder
-    public Member(String password, String nickname, String email, String profileImage, List<Post> posts, ProfileVisible profileVisible) {
+    public Member(String password, String nickname, String email, String profileImage, List<Post> posts, ViewStatus profileVisible) {
         this.password = password;
         this.nickname = nickname;
         this.email = email;
@@ -57,10 +57,13 @@ public class Member extends BaseEntity {
         this.profileVisible = profileVisible;
     }
 
-    public void update(String password, String nickname, ProfileVisible profileVisible) {
-        this.password = password;
+    public void updateProfile(String nickname, ViewStatus profileVisible) {
         this.nickname = nickname;
         this.profileVisible = profileVisible;
+    }
+
+    public void updatePassword(String password) {
+        this.password = password;
     }
 
     public void addRefreshToken(RefreshToken refreshToken) {

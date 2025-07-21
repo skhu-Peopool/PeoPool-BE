@@ -1,10 +1,9 @@
 package com.example.peopoolbe.member.api.dto.request;
 
-import com.example.peopoolbe.member.domain.ProfileVisible;
+import com.example.peopoolbe.member.domain.ViewStatus;
 
 public record MemberProfileUpdateReq(
-        String password,
         String nickname,
-        ProfileVisible profileVisible
+        ViewStatus viewStatus
 ) {
 }

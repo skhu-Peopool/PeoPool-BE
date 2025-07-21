@@ -1,16 +1,15 @@
 package com.example.peopoolbe.member.service;
 
-import com.example.peopoolbe.global.jwt.domain.RefreshToken;
 import com.example.peopoolbe.global.jwt.domain.repository.RefreshTokenRepository;
 import com.example.peopoolbe.global.jwt.service.TokenProvider;
-import com.example.peopoolbe.global.s3.dto.S3ImageUploadRes;
 import com.example.peopoolbe.member.api.dto.request.MemberLoginReq;
 import com.example.peopoolbe.member.api.dto.request.MemberProfileUpdateReq;
+import com.example.peopoolbe.member.api.dto.request.MemberPwdUpdateReq;
 import com.example.peopoolbe.member.api.dto.request.MemberSignUpReq;
 import com.example.peopoolbe.global.jwt.api.dto.TokenResDto;
 import com.example.peopoolbe.member.api.dto.response.UserInfo;
 import com.example.peopoolbe.member.domain.Member;
-import com.example.peopoolbe.member.domain.ProfileVisible;
+import com.example.peopoolbe.member.domain.ViewStatus;
 import com.example.peopoolbe.member.domain.repository.MemberRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.Cookie;
@@ -21,7 +20,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 
@@ -47,7 +45,7 @@ public class MemberService {
                 .email(memberSignUpReq.email())
                 .password(passwordEncoder.encode(memberSignUpReq.password()))
                 .profileImage(defaultImage)
-                .profileVisible(ProfileVisible.INVISIBLE)
+                .profileVisible(ViewStatus.INVISIBLE)
                 .build();
         memberRepository.save(member);
 
@@ -107,10 +105,25 @@ public class MemberService {
     public UserInfo updateUserInfo(Principal principal, MemberProfileUpdateReq memberProfileUpdateReq) {
         Member member = getUserByToken(principal);
 
-        member.update(passwordEncoder.encode(memberProfileUpdateReq.password()),
-                memberProfileUpdateReq.nickname(),
-                memberProfileUpdateReq.profileVisible());
+        member.updateProfile(memberProfileUpdateReq.nickname(),
+                memberProfileUpdateReq.viewStatus());
 
+        memberRepository.save(member);
+
+        return UserInfo.builder()
+                .nickname(member.getNickname())
+                .profileImage(member.getProfileImage())
+                .email(member.getEmail())
+                .profileVisible(member.getProfileVisible())
+                .build();
+    }
+
+    public UserInfo updatePwd(Principal principal, MemberPwdUpdateReq memberPwdUpdateReq) {
+        Member member = getUserByToken(principal);
+        if(!passwordEncoder.matches(memberPwdUpdateReq.password(), member.getPassword()))
+            throw new IllegalArgumentException("일치하지 않는 비밀번호");
+
+        member.updatePassword(passwordEncoder.encode(memberPwdUpdateReq.newPassword()));
         memberRepository.save(member);
 
         return UserInfo.builder()

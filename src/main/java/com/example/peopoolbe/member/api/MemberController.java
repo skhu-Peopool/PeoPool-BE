@@ -4,6 +4,7 @@ import com.example.peopoolbe.global.s3.dto.S3ImageUploadRes;
 import com.example.peopoolbe.global.s3.service.S3Service;
 import com.example.peopoolbe.member.api.dto.request.MemberLoginReq;
 import com.example.peopoolbe.member.api.dto.request.MemberProfileUpdateReq;
+import com.example.peopoolbe.member.api.dto.request.MemberPwdUpdateReq;
 import com.example.peopoolbe.member.api.dto.request.MemberSignUpReq;
 import com.example.peopoolbe.global.jwt.api.dto.TokenResDto;
 import com.example.peopoolbe.member.api.dto.response.UserInfo;
@@ -58,7 +59,7 @@ public class MemberController {
         return ResponseEntity.ok(memberService.getUserInfo(principal));
     }
 
-    @Operation(summary = "유저 정보 수정", description = "암호, 이름, 프로필사진, 공개여부 수정")
+    @Operation(summary = "유저 정보 수정", description = "이름, 공개여부 수정")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "수정 성공"),
             @ApiResponse(responseCode = "403", description = "엑세스토큰 없음"),
@@ -67,6 +68,17 @@ public class MemberController {
     @PatchMapping("/update")
     public ResponseEntity<UserInfo> updateUserInfo(Principal principal, @RequestBody MemberProfileUpdateReq memberProfileUpdateReq) {
         return ResponseEntity.ok(memberService.updateUserInfo(principal, memberProfileUpdateReq));
+    }
+
+    @Operation(summary = "유저 암호 변경", description = "프로필 수정 페이지에서 암호 변경")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "403", description = "엑세스토큰 없음"),
+            @ApiResponse(responseCode = "500", description = "뭔가 하나 안넣었거나, 기존 암호와 불일치")
+    })
+    @PatchMapping("/pwd")
+    public ResponseEntity<UserInfo> updateUserPwd(Principal principal, @RequestBody MemberPwdUpdateReq memberPwdUpdateReq) {
+        return ResponseEntity.ok(memberService.updatePwd(principal, memberPwdUpdateReq));
     }
 
     @Operation(summary = "로그아웃", description = "유저 로그아웃")

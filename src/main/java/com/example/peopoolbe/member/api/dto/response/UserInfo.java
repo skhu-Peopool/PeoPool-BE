@@ -1,7 +1,7 @@
 package com.example.peopoolbe.member.api.dto.response;
 
 import com.example.peopoolbe.member.domain.Member;
-import com.example.peopoolbe.member.domain.ProfileVisible;
+import com.example.peopoolbe.member.domain.ViewStatus;
 import lombok.Builder;
 
 @Builder
@@ -9,7 +9,7 @@ public record UserInfo(
         String nickname,
         String profileImage,
         String email,
-        ProfileVisible profileVisible
+        ViewStatus profileVisible
 ){
     public static UserInfo from(Member member) {
         return UserInfo.builder()

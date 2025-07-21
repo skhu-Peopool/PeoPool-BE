@@ -1,5 +1,5 @@
 package com.example.peopoolbe.member.domain;
 
-public enum ProfileVisible {
+public enum ViewStatus {
     VISIBLE, INVISIBLE
 }

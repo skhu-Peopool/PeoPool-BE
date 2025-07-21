@@ -2,10 +2,7 @@ package com.example.peopoolbe.member.service;
 
 import com.example.peopoolbe.global.jwt.domain.repository.RefreshTokenRepository;
 import com.example.peopoolbe.global.jwt.service.TokenProvider;
-import com.example.peopoolbe.member.api.dto.request.MemberLoginReq;
-import com.example.peopoolbe.member.api.dto.request.MemberProfileUpdateReq;
-import com.example.peopoolbe.member.api.dto.request.MemberPwdUpdateReq;
-import com.example.peopoolbe.member.api.dto.request.MemberSignUpReq;
+import com.example.peopoolbe.member.api.dto.request.*;
 import com.example.peopoolbe.global.jwt.api.dto.TokenResDto;
 import com.example.peopoolbe.member.api.dto.response.UserInfo;
 import com.example.peopoolbe.member.domain.Member;
@@ -118,6 +115,14 @@ public class MemberService {
                 .email(member.getEmail())
                 .profileVisible(member.getProfileVisible())
                 .build();
+    }
+
+    public void changePwd(MemberPwdForgotReq memberPwdForgotReq) {
+        Member member = memberRepository.findByEmail(memberPwdForgotReq.email())
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 멤버"));
+
+        member.updatePassword(passwordEncoder.encode(memberPwdForgotReq.newPassword()));
+        memberRepository.save(member);
     }
 
     public UserInfo updatePwd(Principal principal, MemberPwdUpdateReq memberPwdUpdateReq) {

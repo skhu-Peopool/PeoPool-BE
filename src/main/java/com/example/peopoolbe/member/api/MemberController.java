@@ -2,10 +2,7 @@ package com.example.peopoolbe.member.api;
 
 import com.example.peopoolbe.global.s3.dto.S3ImageUploadRes;
 import com.example.peopoolbe.global.s3.service.S3Service;
-import com.example.peopoolbe.member.api.dto.request.MemberLoginReq;
-import com.example.peopoolbe.member.api.dto.request.MemberProfileUpdateReq;
-import com.example.peopoolbe.member.api.dto.request.MemberPwdUpdateReq;
-import com.example.peopoolbe.member.api.dto.request.MemberSignUpReq;
+import com.example.peopoolbe.member.api.dto.request.*;
 import com.example.peopoolbe.global.jwt.api.dto.TokenResDto;
 import com.example.peopoolbe.member.api.dto.response.UserInfo;
 import com.example.peopoolbe.member.service.MemberService;
@@ -45,7 +42,7 @@ public class MemberController {
             @ApiResponse(responseCode = "200", description = "로그인 성공")
     })
     @PostMapping("/login")
-    public ResponseEntity<TokenResDto> login(@RequestBody MemberLoginReq memberLoginReq, HttpServletResponse response) {
+    public ResponseEntity<TokenResDto> login(@RequestBody @Valid MemberLoginReq memberLoginReq, HttpServletResponse response) {
         return ResponseEntity.ok(memberService.login(memberLoginReq, response));
     }
 
@@ -70,15 +67,26 @@ public class MemberController {
         return ResponseEntity.ok(memberService.updateUserInfo(principal, memberProfileUpdateReq));
     }
 
-    @Operation(summary = "유저 암호 변경", description = "프로필 수정 페이지에서 암호 변경")
+    @Operation(summary = "프로필 수정 - 유저 암호 변경", description = "프로필 수정 페이지에서 암호 변경")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "수정 성공"),
             @ApiResponse(responseCode = "403", description = "엑세스토큰 없음"),
             @ApiResponse(responseCode = "500", description = "뭔가 하나 안넣었거나, 기존 암호와 불일치")
     })
     @PatchMapping("/pwd")
-    public ResponseEntity<UserInfo> updateUserPwd(Principal principal, @RequestBody MemberPwdUpdateReq memberPwdUpdateReq) {
+    public ResponseEntity<UserInfo> updateUserPwd(Principal principal, @RequestBody @Valid MemberPwdUpdateReq memberPwdUpdateReq) {
         return ResponseEntity.ok(memberService.updatePwd(principal, memberPwdUpdateReq));
+    }
+
+    @Operation(summary = "로그인 - 유저 암호 변경", description = "암호를 잊었을 경우 로그인 페이지에서 암호 변경(이메일 코드 전송 활용)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "변경 성공"),
+            @ApiResponse(responseCode = "500", description = "뭔가 하나가 안들어갔다고 할 수 있음")
+    })
+    @PatchMapping("/forgotpwd")
+    public ResponseEntity<Void> forgotUserPwd(@RequestBody @Valid MemberPwdForgotReq memberPwdForgotReq) {
+        memberService.changePwd(memberPwdForgotReq);
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "로그아웃", description = "유저 로그아웃")

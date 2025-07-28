@@ -43,6 +43,8 @@ public class MemberService {
                 .password(passwordEncoder.encode(memberSignUpReq.password()))
                 .profileImage(defaultImage)
                 .profileVisible(ViewStatus.INVISIBLE)
+                .activityVisible(ViewStatus.INVISIBLE)
+                .postVisible(ViewStatus.INVISIBLE)
                 .build();
         memberRepository.save(member);
 
@@ -64,12 +66,6 @@ public class MemberService {
         TokenResDto tokenResDto = tokenProvider.createToken(member);
 
         member.addRefreshToken(refreshTokenRepository.findByRefreshToken(tokenResDto.refreshToken()));
-
-//        Cookie accessCookie = new Cookie("accessToken", tokenProvider.createToken(member).accessToken());
-//        accessCookie.setPath("/");
-//        accessCookie.setHttpOnly(true);
-//        accessCookie.setSecure(true);
-//        accessCookie.setMaxAge(60 * 15); // 15분
 
         addRefreshTokenInCookie(tokenResDto, response);
 
@@ -114,6 +110,8 @@ public class MemberService {
                 .profileImage(member.getProfileImage())
                 .email(member.getEmail())
                 .profileVisible(member.getProfileVisible())
+                .activityVisible(member.getActivityVisible())
+                .postVisible(member.getPostVisible())
                 .build();
     }
 
@@ -150,9 +148,6 @@ public class MemberService {
 
     @Transactional
     public void logout(HttpServletRequest request, HttpServletResponse response) {
-//        Member member = getUserByToken(principal);
-//        member.addRefreshToken(null);
-//
         String refreshToken = null;
         Cookie[] cookies = request.getCookies();
 
@@ -170,10 +165,5 @@ public class MemberService {
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge(0);
         response.addCookie(refreshCookie);
-
-        Cookie refreshCookie1 = new Cookie("refreshCookie", refreshToken);
-        refreshCookie1.setPath("/");
-        refreshCookie1.setMaxAge(0);
-        response.addCookie(refreshCookie1);
     }
 }

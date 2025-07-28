@@ -9,7 +9,9 @@ public record UserInfo(
         String nickname,
         String profileImage,
         String email,
-        ViewStatus profileVisible
+        ViewStatus profileVisible,
+        ViewStatus activityVisible,
+        ViewStatus postVisible
 ){
     public static UserInfo from(Member member) {
         return UserInfo.builder()
@@ -17,6 +19,8 @@ public record UserInfo(
                 .profileImage(member.getProfileImage())
                 .email(member.getEmail())
                 .profileVisible(member.getProfileVisible())
+                .activityVisible(member.getActivityVisible())
+                .postVisible(member.getPostVisible())
                 .build();
     }
 }

@@ -4,15 +4,15 @@ import com.example.peopoolbe.community.domain.Post;
 import com.example.peopoolbe.community.domain.Status;
 import lombok.Builder;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Builder
 public record PostInfoRes(
         Long id,
         String title,
         String content,
-        Date startDate,
-        Date endDate,
+        LocalDateTime startDate,
+        LocalDateTime endDate,
         Integer maxPeople,
         Status status,
         String writerName

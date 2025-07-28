@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -28,6 +29,8 @@ public class PostService {
 
     public PostInfoRes addPost(PostAddReq postAddReq, Principal principal) {
         Member member = memberService.getUserByToken(principal);
+
+        checkStartEndOrder(postAddReq.startDate(), postAddReq.endDate());
 
         Post post = Post.builder()
                 .title(postAddReq.title())
@@ -99,6 +102,7 @@ public class PostService {
         Post post = getPostByPostId(postId);
 
         checkWriter(member, post);
+        checkStartEndOrder(postUpdateReq.startDate(), postUpdateReq.endDate());
 
         post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.startDate() ,postUpdateReq.endDate(), postUpdateReq.maxPeople(), postUpdateReq.status());
         postRepository.save(post);
@@ -131,6 +135,12 @@ public class PostService {
     private void checkWriter(Member member, Post post) {
         if(!post.getMember().getId().equals(member.getId())) {
             throw new IllegalArgumentException("접근 권한 없음");
+        }
+    }
+
+    private void checkStartEndOrder(LocalDateTime startDate, LocalDateTime endDate) {
+        if(startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("날짜의 순서가 올바르지 않음");
         }
     }
 }

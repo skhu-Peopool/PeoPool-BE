@@ -1,14 +1,14 @@
 package com.example.peopoolbe.community.api.dto.request;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public record PostAddReq(
         String title,
         String content,
-        @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-        @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul") LocalDateTime startDate,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul") LocalDateTime endDate,
         Integer maxPeople
 ) {
 }

@@ -1,14 +1,15 @@
 package com.example.peopoolbe.community.api.dto.request;
 
 import com.example.peopoolbe.community.domain.Status;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public record PostUpdateReq(
         String title,
         String content,
-        Date startDate,
-        Date endDate,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul") LocalDateTime startDate,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul") LocalDateTime endDate,
         Integer maxPeople,
         Status status
 ) {

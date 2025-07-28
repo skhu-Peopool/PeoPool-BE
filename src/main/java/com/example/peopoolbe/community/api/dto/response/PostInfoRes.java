@@ -2,7 +2,9 @@ package com.example.peopoolbe.community.api.dto.response;
 
 import com.example.peopoolbe.community.domain.Post;
 import com.example.peopoolbe.community.domain.Status;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
@@ -11,8 +13,8 @@ public record PostInfoRes(
         Long id,
         String title,
         String content,
-        LocalDateTime startDate,
-        LocalDateTime endDate,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul") LocalDateTime startDate,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul") LocalDateTime endDate,
         Integer maxPeople,
         Status status,
         String writerName

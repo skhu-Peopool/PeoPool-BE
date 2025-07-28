@@ -25,7 +25,7 @@ public class Post extends BaseEntity {
 
     @Column(name = "RECRUITMENT_START_DATE")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDateTime recruitmentStartDate; // 이거까지 만들고 접었음 7/22 03:30
+    private LocalDateTime recruitmentStartDate;
 
     @Column(name = "RECRUITMENT_END_DATE")
     @DateTimeFormat(pattern = "yyyy-MM-dd")

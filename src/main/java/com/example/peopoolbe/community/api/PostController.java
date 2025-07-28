@@ -9,17 +9,20 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/post")
 public class PostController {
     private final PostService postService;
+
 
     @Operation(summary = "게시물 등록", description = "커뮤니티에 게시물을 등록")
     @ApiResponses({
@@ -54,13 +57,16 @@ public class PostController {
     @Operation(summary = "게시물 검색", description = "제목, 본문, 작성자를 검색하여 게시물 조회, 페이지는 1부터 시작")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
-            @ApiResponse(responseCode = "403", description = "엑세스토큰 없음")
+            @ApiResponse(responseCode = "403", description = "엑세스토큰 없음"),
+            @ApiResponse(responseCode = "500", description = "검색어를 안넣었거나, 기타 오류 발생")
     })
     @GetMapping("/search")
     public ResponseEntity<PostListRes> searchPost(@RequestParam String query,
                                                   @RequestParam(defaultValue = "1") int page,
-                                                  @RequestParam(defaultValue = "6") int size) {
-        return ResponseEntity.ok(postService.searchPost(query, page, size));
+                                                  @RequestParam(defaultValue = "6") int size,
+                                                  @RequestParam(defaultValue = "1900-01-01 00:00:01") String start,
+                                                  @RequestParam(defaultValue = "2100-01-01 23:59:59") String end) {
+        return ResponseEntity.ok(postService.searchPost(query, page, size, start, end));
     }
 
     @Operation(summary = "게시물 수정", description = "본인이 작성한 게시물 수정")

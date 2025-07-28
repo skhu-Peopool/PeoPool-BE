@@ -11,6 +11,7 @@ public record PostInfoRes(
         Long id,
         String title,
         String content,
+        Date startDate,
         Date endDate,
         Integer maxPeople,
         Status status,
@@ -21,6 +22,7 @@ public record PostInfoRes(
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
+                .startDate(post.getRecruitmentStartDate())
                 .endDate(post.getRecruitmentEndDate())
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())

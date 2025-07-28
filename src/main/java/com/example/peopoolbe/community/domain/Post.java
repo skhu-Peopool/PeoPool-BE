@@ -3,14 +3,11 @@ package com.example.peopoolbe.community.domain;
 import com.example.peopoolbe.global.entity.BaseEntity;
 import com.example.peopoolbe.member.domain.Member;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -23,6 +20,10 @@ public class Post extends BaseEntity {
 
     @Column(name = "CONTENT", nullable = false)
     private String content;
+
+    @Column(name = "RECRUITMENT_START_DATE")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date recruitmentStartDate; // 이거까지 만들고 접었음 7/22 03:30
 
     @Column(name = "RECRUITMENT_END_DATE")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -40,18 +41,20 @@ public class Post extends BaseEntity {
     private Member member;
 
     @Builder
-    public Post(String title, String content, Date recruitmentEndDate, Integer maximumPeople, Status status, Member member) {
+    public Post(String title, String content, Date recruitmentStartDate, Date recruitmentEndDate, Integer maximumPeople, Status status, Member member) {
         this.title = title;
         this.content = content;
+        this.recruitmentStartDate = recruitmentStartDate;
         this.recruitmentEndDate = recruitmentEndDate;
         this.maximumPeople = maximumPeople;
         this.status = status;
         this.member = member;
     }
 
-    public void update(String title, String content, Date recruitmentEndDate, Integer maximumPeople, Status status) {
+    public void update(String title, String content, Date recruitmentStartDate, Date recruitmentEndDate, Integer maximumPeople, Status status) {
         this.title = title;
         this.content = content;
+        this.recruitmentStartDate = recruitmentStartDate;
         this.recruitmentEndDate = recruitmentEndDate;
         this.maximumPeople = maximumPeople;
         this.status = status;

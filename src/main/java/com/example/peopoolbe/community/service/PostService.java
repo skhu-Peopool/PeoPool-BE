@@ -32,6 +32,7 @@ public class PostService {
         Post post = Post.builder()
                 .title(postAddReq.title())
                 .content(postAddReq.content())
+                .recruitmentStartDate(postAddReq.startDate())
                 .recruitmentEndDate(postAddReq.endDate())
                 .maximumPeople(postAddReq.maxPeople())
                 .status(Status.RECRUITING)
@@ -44,6 +45,7 @@ public class PostService {
                 .id(post.getId())
                 .title(postAddReq.title())
                 .content(postAddReq.content())
+                .startDate(postAddReq.startDate())
                 .endDate(postAddReq.endDate())
                 .maxPeople(postAddReq.maxPeople())
                 .status(Status.RECRUITING)
@@ -58,6 +60,7 @@ public class PostService {
                 .id(postId)
                 .title(post.getTitle())
                 .content(post.getTitle())
+                .startDate(post.getRecruitmentStartDate())
                 .endDate(post.getRecruitmentEndDate())
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
@@ -97,13 +100,14 @@ public class PostService {
 
         checkWriter(member, post);
 
-        post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.endDate(), postUpdateReq.maxPeople(), postUpdateReq.status());
+        post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.startDate() ,postUpdateReq.endDate(), postUpdateReq.maxPeople(), postUpdateReq.status());
         postRepository.save(post);
 
         return PostInfoRes.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
+                .startDate(post.getRecruitmentStartDate())
                 .endDate(post.getRecruitmentEndDate())
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())

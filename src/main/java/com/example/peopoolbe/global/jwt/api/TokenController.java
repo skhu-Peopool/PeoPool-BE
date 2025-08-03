@@ -1,6 +1,7 @@
 package com.example.peopoolbe.global.jwt.api;
 
 import com.example.peopoolbe.global.jwt.api.dto.AccTokenResDto;
+import com.example.peopoolbe.global.jwt.api.dto.AccessTokenAndUserInfo;
 import com.example.peopoolbe.global.jwt.service.TokenProvider;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,7 +23,7 @@ public class TokenController {
             @ApiResponse(responseCode = "200", description = "엑세스토큰 생성")
     })
     @PostMapping("/token")
-    public ResponseEntity<AccTokenResDto> accessTokenReIssue(@CookieValue String refreshToken) {
-        return ResponseEntity.ok(tokenProvider.accessTokenReIssue(refreshToken));
+    public ResponseEntity<AccessTokenAndUserInfo> accessTokenReIssue(@CookieValue String refreshToken) {
+        return ResponseEntity.ok(tokenProvider.getAccessTokenAndUserInfo(refreshToken));
     }
 }

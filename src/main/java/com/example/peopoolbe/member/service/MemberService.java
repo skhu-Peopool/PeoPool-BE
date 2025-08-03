@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
+import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -150,6 +151,9 @@ public class MemberService {
     public void logout(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = null;
         Cookie[] cookies = request.getCookies();
+        for(Cookie cookie : cookies) {
+            System.out.println(cookie.getName() + " + " + cookie.getValue());
+        }
 
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -158,12 +162,16 @@ public class MemberService {
                     break;
                 }
             }
+            for (Cookie cookie : cookies) {
+                cookie.setMaxAge(0);
+                response.addCookie(cookie);
+            }
         }
         refreshTokenRepository.deleteByRefreshToken(refreshToken);
 
-        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-        refreshCookie.setPath("/");
-        refreshCookie.setMaxAge(0);
-        response.addCookie(refreshCookie);
+//        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
+//        refreshCookie.setPath("/");
+//        refreshCookie.setMaxAge(0);
+//        response.addCookie(refreshCookie);
     }
 }

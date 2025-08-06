@@ -1,5 +1,6 @@
 package com.example.peopoolbe.community.api.dto.response;
 
+import com.example.peopoolbe.community.domain.Category;
 import com.example.peopoolbe.community.domain.Post;
 import com.example.peopoolbe.community.domain.Status;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -17,6 +18,7 @@ public record PostInfoRes(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul") LocalDateTime endDate,
         Integer maxPeople,
         Status status,
+        Category category,
         String writerName
 ) {
     public static PostInfoRes from(Post post) {
@@ -28,6 +30,7 @@ public record PostInfoRes(
                 .endDate(post.getRecruitmentEndDate())
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
+                .category(post.getCategory())
                 .writerName(post.getMember().getNickname())
                 .build();
     }

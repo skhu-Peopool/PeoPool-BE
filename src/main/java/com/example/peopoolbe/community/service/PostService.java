@@ -44,6 +44,7 @@ public class PostService {
                 .recruitmentEndDate(postAddReq.endDate())
                 .maximumPeople(postAddReq.maxPeople())
                 .status(Status.RECRUITING)
+                .category(postAddReq.category())
                 .member(member)
                 .build();
 
@@ -57,6 +58,7 @@ public class PostService {
                 .endDate(postAddReq.endDate())
                 .maxPeople(postAddReq.maxPeople())
                 .status(Status.RECRUITING)
+                .category(postAddReq.category())
                 .writerName(member.getNickname())
                 .build();
     }
@@ -72,6 +74,7 @@ public class PostService {
                 .endDate(post.getRecruitmentEndDate())
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
+                .category(post.getCategory())
                 .writerName(post.getMember().getNickname())
                 .build();
     }
@@ -113,7 +116,7 @@ public class PostService {
         checkWriter(member, post);
         checkStartEndOrder(postUpdateReq.startDate(), postUpdateReq.endDate());
 
-        post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.startDate() ,postUpdateReq.endDate(), postUpdateReq.maxPeople(), postUpdateReq.status());
+        post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.startDate() ,postUpdateReq.endDate(), postUpdateReq.maxPeople(), postUpdateReq.status(), postUpdateReq.category());
         postRepository.save(post);
 
         return PostInfoRes.builder()
@@ -124,6 +127,7 @@ public class PostService {
                 .endDate(post.getRecruitmentEndDate())
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
+                .category(post.getCategory())
                 .writerName(post.getMember().getNickname())
                 .build();
     }

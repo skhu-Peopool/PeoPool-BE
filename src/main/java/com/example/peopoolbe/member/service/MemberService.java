@@ -76,7 +76,6 @@ public class MemberService {
     public void addRefreshTokenInCookie(TokenResDto tokenResDto, HttpServletResponse response) {
         Cookie refreshCookie = new Cookie("refreshToken", tokenResDto.refreshToken());
         refreshCookie.setPath("/");
-        refreshCookie.setPath("/");
         refreshCookie.setHttpOnly(true);
         refreshCookie.setSecure(true);
         refreshCookie.setAttribute("SameSite", "None");
@@ -162,16 +161,18 @@ public class MemberService {
                     break;
                 }
             }
-            for (Cookie cookie : cookies) {
-                cookie.setMaxAge(0);
-                response.addCookie(cookie);
-            }
         }
-        refreshTokenRepository.deleteByRefreshToken(refreshToken);
 
-//        Cookie refreshCookie = new Cookie("refreshToken", refreshToken);
-//        refreshCookie.setPath("/");
-//        refreshCookie.setMaxAge(0);
-//        response.addCookie(refreshCookie);
+        if(refreshToken != null) {
+            refreshTokenRepository.deleteByRefreshToken(refreshToken);
+        }
+
+        Cookie refreshCookie = new Cookie("refreshToken", "");
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(0);
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(true);
+        refreshCookie.setAttribute("SameSite", "None");
+        response.addCookie(refreshCookie);
     }
 }

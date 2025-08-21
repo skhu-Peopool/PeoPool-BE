@@ -1,5 +1,6 @@
 package com.example.peopoolbe.global.jwt.service;
 
+import com.example.peopoolbe.global.jwt.api.dto.AccessTokenAndUserInfo;
 import com.example.peopoolbe.global.jwt.domain.RefreshToken;
 import com.example.peopoolbe.global.jwt.domain.repository.RefreshTokenRepository;
 import com.example.peopoolbe.global.jwt.api.dto.AccTokenResDto;
@@ -102,6 +103,22 @@ public class TokenProvider {
 
         return AccTokenResDto.builder()
                 .accessToken(accessTokenBuilder(member))
+                .build();
+    }
+
+    public AccessTokenAndUserInfo getAccessTokenAndUserInfo(String refreshToken) {
+        Long userId = Long.parseLong(parseClaims(refreshToken).getSubject());
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("존재하지 않는 사용자"));
+
+        return AccessTokenAndUserInfo.builder()
+                .accessToken(accessTokenBuilder(member))
+                .nickname(member.getNickname())
+                .profileImage(member.getProfileImage())
+                .email(member.getEmail())
+                .profileVisible(member.getProfileVisible())
+                .activityVisible(member.getActivityVisible())
+                .postVisible(member.getPostVisible())
                 .build();
     }
 

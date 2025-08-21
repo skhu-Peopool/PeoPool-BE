@@ -14,13 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -44,6 +40,7 @@ public class PostService {
                 .recruitmentEndDate(postAddReq.endDate())
                 .maximumPeople(postAddReq.maxPeople())
                 .status(Status.RECRUITING)
+                .category(postAddReq.category())
                 .member(member)
                 .build();
 
@@ -57,6 +54,7 @@ public class PostService {
                 .endDate(postAddReq.endDate())
                 .maxPeople(postAddReq.maxPeople())
                 .status(Status.RECRUITING)
+                .category(postAddReq.category())
                 .writerName(member.getNickname())
                 .build();
     }
@@ -72,6 +70,7 @@ public class PostService {
                 .endDate(post.getRecruitmentEndDate())
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
+                .category(post.getCategory())
                 .writerName(post.getMember().getNickname())
                 .build();
     }
@@ -113,7 +112,7 @@ public class PostService {
         checkWriter(member, post);
         checkStartEndOrder(postUpdateReq.startDate(), postUpdateReq.endDate());
 
-        post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.startDate() ,postUpdateReq.endDate(), postUpdateReq.maxPeople(), postUpdateReq.status());
+        post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.startDate() ,postUpdateReq.endDate(), postUpdateReq.maxPeople(), postUpdateReq.status(), postUpdateReq.category());
         postRepository.save(post);
 
         return PostInfoRes.builder()
@@ -124,6 +123,7 @@ public class PostService {
                 .endDate(post.getRecruitmentEndDate())
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
+                .category(post.getCategory())
                 .writerName(post.getMember().getNickname())
                 .build();
     }

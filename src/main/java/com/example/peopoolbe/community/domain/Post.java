@@ -38,12 +38,16 @@ public class Post extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Column(name = "POST_CATEGORY", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Category category;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
     @Builder
-    public Post(String title, String content, LocalDateTime recruitmentStartDate, LocalDateTime recruitmentEndDate, Integer maximumPeople, Status status, Member member) {
+    public Post(String title, String content, LocalDateTime recruitmentStartDate, LocalDateTime recruitmentEndDate, Integer maximumPeople, Status status, Category category, Member member) {
         this.title = title;
         this.content = content;
         this.recruitmentStartDate = recruitmentStartDate;
@@ -51,14 +55,16 @@ public class Post extends BaseEntity {
         this.maximumPeople = maximumPeople;
         this.status = status;
         this.member = member;
+        this.category = category;
     }
 
-    public void update(String title, String content, LocalDateTime recruitmentStartDate, LocalDateTime recruitmentEndDate, Integer maximumPeople, Status status) {
+    public void update(String title, String content, LocalDateTime recruitmentStartDate, LocalDateTime recruitmentEndDate, Integer maximumPeople, Status status, Category category) {
         this.title = title;
         this.content = content;
         this.recruitmentStartDate = recruitmentStartDate;
         this.recruitmentEndDate = recruitmentEndDate;
         this.maximumPeople = maximumPeople;
         this.status = status;
+        this.category = category;
     }
 }

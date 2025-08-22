@@ -55,6 +55,7 @@ public class Post extends BaseEntity {
         this.maximumPeople = maximumPeople;
         this.status = status;
         this.member = member;
+        this.category = category;
     }
 
     public void update(String title, String content, LocalDateTime recruitmentStartDate, LocalDateTime recruitmentEndDate, Integer maximumPeople, Status status, Category category) {
@@ -64,5 +65,6 @@ public class Post extends BaseEntity {
         this.recruitmentEndDate = recruitmentEndDate;
         this.maximumPeople = maximumPeople;
         this.status = status;
+        this.category = category;
     }
 }

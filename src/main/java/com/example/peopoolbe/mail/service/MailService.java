@@ -63,11 +63,11 @@ public class MailService {
         return number;
     }
 
-    public boolean checkCode(String email, String code) {
-        if(redisUtil.getData(code) == null) {
+    public boolean checkCode(String email, Integer code) {
+        if(redisUtil.getData(code.toString()) == null) {
             return false;
         }
-        else if(redisUtil.getData(code).equals(email)) {
+        else if(redisUtil.getData(code.toString()).equals(email)) {
             return true;
         }
         else return false;

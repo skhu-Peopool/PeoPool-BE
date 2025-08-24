@@ -64,8 +64,8 @@ public class PostController {
     public ResponseEntity<PostListRes> searchPost(@RequestParam String query,
                                                   @RequestParam(defaultValue = "1") int page,
                                                   @RequestParam(defaultValue = "6") int size,
-                                                  @RequestParam(defaultValue = "1900-01-01 00:00:01") String start,
-                                                  @RequestParam(defaultValue = "2100-01-01 23:59:59") String end) {
+                                                  @RequestParam(defaultValue = "1900-01-01") String start,
+                                                  @RequestParam(defaultValue = "2100-01-01") String end) {
         return ResponseEntity.ok(postService.searchPost(query, page, size, start, end));
     }
 

@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -91,8 +92,8 @@ public class PostService {
     public PostListRes searchPost(String word, int page, int size, String startDateTime, String endDateTime){
         Pageable pageable = PageRequest.of(page-1, size);
 
-        LocalDateTime start = LocalDateTime.parse(startDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        LocalDateTime end = LocalDateTime.parse(endDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        LocalDateTime start = LocalDateTime.parse(startDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDateTime end = LocalDateTime.parse(endDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
         Page<Post> postPage = postRepository.searchPost(pageable, word, start, end);
 
@@ -147,7 +148,7 @@ public class PostService {
         }
     }
 
-    private void checkStartEndOrder(LocalDateTime startDate, LocalDateTime endDate) {
+    private void checkStartEndOrder(LocalDate startDate, LocalDate endDate) {
         if(startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("날짜의 순서가 올바르지 않음");
         }

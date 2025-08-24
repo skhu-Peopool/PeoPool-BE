@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Getter
@@ -25,11 +23,11 @@ public class Post extends BaseEntity {
 
     @Column(name = "RECRUITMENT_START_DATE")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDateTime recruitmentStartDate;
+    private LocalDate recruitmentStartDate;
 
     @Column(name = "RECRUITMENT_END_DATE")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDateTime recruitmentEndDate;
+    private LocalDate recruitmentEndDate;
 
     @Column(name = "MAXIMUM_PEOPLE")
     private Integer maximumPeople;
@@ -47,7 +45,7 @@ public class Post extends BaseEntity {
     private Member member;
 
     @Builder
-    public Post(String title, String content, LocalDateTime recruitmentStartDate, LocalDateTime recruitmentEndDate, Integer maximumPeople, Status status, Category category, Member member) {
+    public Post(String title, String content, LocalDate recruitmentStartDate, LocalDate recruitmentEndDate, Integer maximumPeople, Status status, Category category, Member member) {
         this.title = title;
         this.content = content;
         this.recruitmentStartDate = recruitmentStartDate;
@@ -58,7 +56,7 @@ public class Post extends BaseEntity {
         this.category = category;
     }
 
-    public void update(String title, String content, LocalDateTime recruitmentStartDate, LocalDateTime recruitmentEndDate, Integer maximumPeople, Status status, Category category) {
+    public void update(String title, String content, LocalDate recruitmentStartDate, LocalDate recruitmentEndDate, Integer maximumPeople, Status status, Category category) {
         this.title = title;
         this.content = content;
         this.recruitmentStartDate = recruitmentStartDate;

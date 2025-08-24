@@ -40,7 +40,7 @@ public class PostService {
                 .recruitmentStartDate(postAddReq.startDate())
                 .recruitmentEndDate(postAddReq.endDate())
                 .maximumPeople(postAddReq.maxPeople())
-                .status(Status.RECRUITING)
+                .status(postAddReq.startDate().isEqual(LocalDate.now()) ? Status.RECRUITING : Status.UPCOMING)
                 .category(postAddReq.category())
                 .member(member)
                 .build();
@@ -54,7 +54,7 @@ public class PostService {
                 .startDate(postAddReq.startDate())
                 .endDate(postAddReq.endDate())
                 .maxPeople(postAddReq.maxPeople())
-                .status(Status.RECRUITING)
+                .status(post.getStatus())
                 .category(postAddReq.category())
                 .writerName(member.getNickname())
                 .build();

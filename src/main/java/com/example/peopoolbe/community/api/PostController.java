@@ -44,29 +44,29 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostInfo(postId));
     }
 
-    @Operation(summary = "게시물 리스트 조회", description = "게시물 리스트를 조회, 토큰이 불필요, 페이지는 1부터 시작")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공")
-    })
-    @GetMapping("/list")
-    public ResponseEntity<PostListRes> getPostList(@RequestParam(defaultValue = "1") int page,
-                                                   @RequestParam(defaultValue = "6") int size) {
-        return ResponseEntity.ok(postService.getPostList(page, size));
-    }
+//    @Operation(summary = "게시물 리스트 조회", description = "게시물 리스트를 조회, 토큰이 불필요, 페이지는 1부터 시작")
+//    @ApiResponses({
+//            @ApiResponse(responseCode = "200", description = "조회 성공")
+//    })
+//    @GetMapping("/list")
+//    public ResponseEntity<PostListRes> getPostList(@RequestParam(defaultValue = "1") int page,
+//                                                   @RequestParam(defaultValue = "6") int size) {
+//        return ResponseEntity.ok(postService.getPostList(page, size));
+//    }
 
-    @Operation(summary = "게시물 검색", description = "제목, 본문, 작성자를 검색하여 게시물 조회, 페이지는 1부터 시작")
+    @Operation(summary = "게시물 리스트 조회", description = "게시물 리스트를 조회, 검색어와 마감날짜를 쿼리스트링으로 입력하여 검색 가능")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),
             @ApiResponse(responseCode = "403", description = "엑세스토큰 없음"),
             @ApiResponse(responseCode = "500", description = "검색어를 안넣었거나, 기타 오류 발생")
     })
-    @GetMapping("/search")
-    public ResponseEntity<PostListRes> searchPost(@RequestParam String query,
+    @GetMapping("/list")
+    public ResponseEntity<PostListRes> searchPost(@RequestParam(defaultValue = "") String query,
                                                   @RequestParam(defaultValue = "1") int page,
                                                   @RequestParam(defaultValue = "6") int size,
                                                   @RequestParam(defaultValue = "1900-01-01") String start,
                                                   @RequestParam(defaultValue = "2100-01-01") String end) {
-        return ResponseEntity.ok(postService.searchPost(query, page, size, start, end));
+        return ResponseEntity.ok(postService.getPostList(query, page, size, start, end));
     }
 
     @Operation(summary = "게시물 수정", description = "본인이 작성한 게시물 수정")

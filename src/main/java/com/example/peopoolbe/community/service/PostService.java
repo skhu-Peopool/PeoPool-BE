@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -79,9 +78,15 @@ public class PostService {
                 .build();
     }
 
-    public PostListRes getPostList(int page, int size) {
+    public PostListRes getPostList(String word, int page, int size, String startDate, String endDate) {
         Pageable pageable = PageRequest.of(page-1, size);
-        Page<Post> postPage = postRepository.findAll(pageable);
+        Page<Post> postPage;
+
+        LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDate end = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        if(word.isBlank()) postPage = postRepository.searchPost(pageable, start, end);
+        else postPage = postRepository.searchPostByWord(pageable, word, start, end);
 
         List<Post> postList = postPage.getContent();
 
@@ -92,22 +97,22 @@ public class PostService {
         return PostListRes.fromPostList(postInfoResList);
     }
 
-    public PostListRes searchPost(String word, int page, int size, String startDateTime, String endDateTime){
-        Pageable pageable = PageRequest.of(page-1, size);
-
-        LocalDateTime start = LocalDateTime.parse(startDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-        LocalDateTime end = LocalDateTime.parse(endDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
-        Page<Post> postPage = postRepository.searchPost(pageable, word, start, end);
-
-        List<Post> postList = postPage.getContent();
-
-        List<PostInfoRes> postInfoResList = postList.stream()
-                .map(PostInfoRes::from)
-                .toList();
-
-        return PostListRes.fromPostList(postInfoResList);
-    }
+//    public PostListRes searchPost(String word, int page, int size, String startDateTime, String endDateTime){
+//        Pageable pageable = PageRequest.of(page-1, size);
+//
+//        LocalDateTime start = LocalDateTime.parse(startDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+//        LocalDateTime end = LocalDateTime.parse(endDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+//
+//        Page<Post> postPage = postRepository.searchPost(pageable, word, start, end);
+//
+//        List<Post> postList = postPage.getContent();
+//
+//        List<PostInfoRes> postInfoResList = postList.stream()
+//                .map(PostInfoRes::from)
+//                .toList();
+//
+//        return PostListRes.fromPostList(postInfoResList);
+//    }
 
     public PostInfoRes updatePost(Long postId, PostUpdateReq postUpdateReq, Principal principal) {
         Member member = memberService.getUserByToken(principal);

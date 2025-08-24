@@ -32,7 +32,10 @@ public class PostService {
     public PostInfoRes addPost(PostAddReq postAddReq, Principal principal) {
         Member member = memberService.getUserByToken(principal);
 
-        checkStartEndOrder(postAddReq.startDate(), postAddReq.endDate());
+        checkDateStartEndOrder(postAddReq.startDate(), postAddReq.endDate());
+
+        if(postAddReq.startDate().isBefore(LocalDate.now()))
+            throw new IllegalArgumentException("모집 시작 날짜가 현재 날짜보다 앞섭니다.");
 
         Post post = Post.builder()
                 .title(postAddReq.title())
@@ -111,7 +114,11 @@ public class PostService {
         Post post = getPostByPostId(postId);
 
         checkWriter(member, post);
-        checkStartEndOrder(postUpdateReq.startDate(), postUpdateReq.endDate());
+        checkDateStartEndOrder(postUpdateReq.startDate(), postUpdateReq.endDate());
+
+        if(!post.getRecruitmentStartDate().isEqual(postUpdateReq.startDate()))
+            if(postUpdateReq.startDate().isBefore(LocalDate.now()))
+                throw new IllegalArgumentException("수정된 시작 날짜가 현재 날짜보다 앞섭니다.");
 
         post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.startDate() ,postUpdateReq.endDate(), postUpdateReq.maxPeople(), postUpdateReq.status(), postUpdateReq.category());
         postRepository.save(post);
@@ -148,7 +155,7 @@ public class PostService {
         }
     }
 
-    private void checkStartEndOrder(LocalDate startDate, LocalDate endDate) {
+    private void checkDateStartEndOrder(LocalDate startDate, LocalDate endDate) {
         if(startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("날짜의 순서가 올바르지 않음");
         }

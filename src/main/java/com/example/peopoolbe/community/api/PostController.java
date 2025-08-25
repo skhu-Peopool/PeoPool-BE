@@ -11,8 +11,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -29,9 +31,9 @@ public class PostController {
             @ApiResponse(responseCode = "201", description = "게시물 등록 성공"),
             @ApiResponse(responseCode = "403", description = "엑세스토큰 없음")
     })
-    @PostMapping("/add")
-    public ResponseEntity<PostInfoRes> addPost(Principal principal, @RequestBody PostAddReq postAddReq) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(postService.addPost(postAddReq, principal));
+    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PostInfoRes> addPost(Principal principal, @RequestPart PostAddReq postAddReq, @RequestPart MultipartFile image) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(postService.addPost(postAddReq, image, principal));
     }
 
     @Operation(summary = "게시물 조회", description = "게시물 ID값으로 게시물을 조회")
@@ -75,9 +77,9 @@ public class PostController {
             @ApiResponse(responseCode = "403", description = "엑세스토큰 없음"),
             @ApiResponse(responseCode = "500", description = "수정 권한 없음")
     })
-    @PatchMapping("/update/{postId}")
-    public ResponseEntity<PostInfoRes> updatePost(Principal principal, @PathVariable Long postId, @RequestBody PostUpdateReq postUpdateReq) {
-        return ResponseEntity.ok(postService.updatePost(postId, postUpdateReq, principal));
+    @PatchMapping(value = "/update/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PostInfoRes> updatePost(Principal principal, @PathVariable Long postId, @RequestPart PostUpdateReq postUpdateReq, @RequestPart MultipartFile image) {
+        return ResponseEntity.ok(postService.updatePost(postId, postUpdateReq, image, principal));
     }
 
     @Operation(summary = "게시물 삭제", description = "본인이 작성한 게시물 삭제")

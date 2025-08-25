@@ -4,6 +4,8 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.example.peopoolbe.community.domain.Post;
+import com.example.peopoolbe.community.domain.repository.PostRepository;
 import com.example.peopoolbe.global.s3.dto.S3ImageUploadRes;
 import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.domain.repository.MemberRepository;
@@ -29,31 +31,22 @@ public class S3Service {
     private final AmazonS3 amazonS3;
     private final MemberService memberService;
     private final MemberRepository memberRepository;
+    private final PostRepository postRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public S3ImageUploadRes uploadImage(Principal principal, MultipartFile multipartFile) {
+    public S3ImageUploadRes uploadProfileImage(Principal principal, MultipartFile multipartFile) {
         if(multipartFile.isEmpty()) {
             return null;
         }
         Member member = memberService.getUserByToken(principal);
-        String formerFileName = extractFormerFileName(member);
+        String formerFileName = extractFormerFileNameFromMember(member);
         System.out.println(formerFileName);
 
         String fileName = createFileName(multipartFile.getOriginalFilename());
 
-        ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(multipartFile.getSize());
-        objectMetadata.setContentType(multipartFile.getContentType());
-
-        try(InputStream inputStream = multipartFile.getInputStream()) {
-            amazonS3.putObject(bucket, fileName, inputStream, objectMetadata);
-        } catch (AmazonServiceException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
-        }
+        awsImageUpload(multipartFile, fileName);
 
         String url = amazonS3.getUrl(bucket, fileName).toString();
         member.updateImage(url);
@@ -67,7 +60,48 @@ public class S3Service {
                 .build();
     }
 
-    private String extractFormerFileName(Member member) {
+    public String uploadNewPostImage(MultipartFile multipartFile) {
+        if(multipartFile.isEmpty()) {
+            return null;
+        }
+
+        String fileName = createFileName(multipartFile.getOriginalFilename());
+        awsImageUpload(multipartFile, fileName);
+        return amazonS3.getUrl(bucket, fileName).toString();
+    }
+
+    public String uploadExistingPostImage(MultipartFile multipartFile, Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        if(multipartFile.isEmpty()) {
+            return null;
+        }
+
+        String formerFileName = extractFormerFileNameFromPost(post);
+
+        String fileName = createFileName(multipartFile.getOriginalFilename());
+        awsImageUpload(multipartFile, fileName);
+
+        deleteImage(formerFileName);
+
+        return amazonS3.getUrl(bucket, fileName).toString();
+    }
+
+    private void awsImageUpload(MultipartFile multipartFile, String fileName) {
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(multipartFile.getSize());
+        objectMetadata.setContentType(multipartFile.getContentType());
+
+        try(InputStream inputStream = multipartFile.getInputStream()) {
+            amazonS3.putObject(bucket, fileName, inputStream, objectMetadata);
+        } catch (AmazonServiceException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
+        }
+    }
+
+    private String extractFormerFileNameFromMember(Member member) {
         String formerFileUrl = member.getProfileImage();
 
         String regex = "([^/]+\\.jpg)$";
@@ -76,6 +110,19 @@ public class S3Service {
 
         if(matcher.find()) {
             return matcher.group(1);
+        }
+        return null;
+    }
+
+    private String extractFormerFileNameFromPost(Post post) {
+        String formerFileUrl = post.getImage();
+        if(formerFileUrl != null) {
+            String regex = "([^/]+\\.jpg)$";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(formerFileUrl);
+            if(matcher.find()) {
+                return matcher.group(1);
+            }
         }
         return null;
     }

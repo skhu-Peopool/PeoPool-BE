@@ -7,6 +7,7 @@ import com.example.peopoolbe.community.api.dto.response.PostListRes;
 import com.example.peopoolbe.community.domain.Post;
 import com.example.peopoolbe.community.domain.Status;
 import com.example.peopoolbe.community.domain.repository.PostRepository;
+import com.example.peopoolbe.global.s3.service.S3Service;
 import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.service.MemberService;
 import jakarta.persistence.EntityNotFoundException;
@@ -14,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -27,8 +30,9 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final MemberService memberService;
+    private final S3Service s3Service;
 
-    public PostInfoRes addPost(PostAddReq postAddReq, Principal principal) {
+    public PostInfoRes addPost(PostAddReq postAddReq, MultipartFile image, Principal principal) {
         Member member = memberService.getUserByToken(principal);
 
         checkDateStartEndOrder(postAddReq.startDate(), postAddReq.endDate());
@@ -44,6 +48,7 @@ public class PostService {
                 .maximumPeople(postAddReq.maxPeople())
                 .status(postAddReq.startDate().isEqual(LocalDate.now()) ? Status.RECRUITING : Status.UPCOMING)
                 .category(postAddReq.category())
+                .image(s3Service.uploadNewPostImage(image))
                 .member(member)
                 .build();
 
@@ -58,6 +63,8 @@ public class PostService {
                 .maxPeople(postAddReq.maxPeople())
                 .status(post.getStatus())
                 .category(postAddReq.category())
+                .image(post.getImage())
+                .writerId(member.getId())
                 .writerName(member.getNickname())
                 .build();
     }
@@ -74,12 +81,14 @@ public class PostService {
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
                 .category(post.getCategory())
+                .image(post.getImage())
+                .writerId(post.getMember().getId())
                 .writerName(post.getMember().getNickname())
                 .build();
     }
 
     public PostListRes getPostList(String word, int page, int size, String startDate, String endDate) {
-        Pageable pageable = PageRequest.of(page-1, size);
+        Pageable pageable = PageRequest.of(page-1, size, Sort.by("id").descending());
         Page<Post> postPage;
 
         LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
@@ -114,7 +123,7 @@ public class PostService {
 //        return PostListRes.fromPostList(postInfoResList);
 //    }
 
-    public PostInfoRes updatePost(Long postId, PostUpdateReq postUpdateReq, Principal principal) {
+    public PostInfoRes updatePost(Long postId, PostUpdateReq postUpdateReq, MultipartFile image, Principal principal) {
         Member member = memberService.getUserByToken(principal);
         Post post = getPostByPostId(postId);
 
@@ -125,7 +134,9 @@ public class PostService {
             if(postUpdateReq.startDate().isBefore(LocalDate.now()))
                 throw new IllegalArgumentException("수정된 시작 날짜가 현재 날짜보다 앞섭니다.");
 
-        post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.startDate() ,postUpdateReq.endDate(), postUpdateReq.maxPeople(), postUpdateReq.status(), postUpdateReq.category());
+        post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.startDate(),
+                postUpdateReq.endDate(), postUpdateReq.maxPeople(), postUpdateReq.status(),
+                postUpdateReq.category(), s3Service.uploadExistingPostImage(image, postId));
         postRepository.save(post);
 
         return PostInfoRes.builder()
@@ -137,7 +148,9 @@ public class PostService {
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
                 .category(post.getCategory())
-                .writerName(post.getMember().getNickname())
+                .image(post.getImage())
+                .writerId(member.getId())
+                .writerName(member.getNickname())
                 .build();
     }
 

@@ -18,6 +18,8 @@ public record PostInfoRes(
         Integer maxPeople,
         Status status,
         Category category,
+        String image,
+        Long writerId,
         String writerName
 ) {
     public static PostInfoRes from(Post post) {
@@ -30,6 +32,8 @@ public record PostInfoRes(
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
                 .category(post.getCategory())
+                .image(post.getImage())
+                .writerId(post.getMember().getId())
                 .writerName(post.getMember().getNickname())
                 .build();
     }

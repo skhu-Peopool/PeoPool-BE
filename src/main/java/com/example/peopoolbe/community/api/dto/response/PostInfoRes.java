@@ -7,14 +7,18 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Builder
 public record PostInfoRes(
         Long id,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt,
         String title,
         String content,
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul") LocalDate startDate,
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul") LocalDate endDate,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul") LocalDate recruitmentStartDate,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul") LocalDate recruitmentEndDate,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul") LocalDate activityStartDate,
         Integer maxPeople,
         Status status,
         Category category,
@@ -25,10 +29,13 @@ public record PostInfoRes(
     public static PostInfoRes from(Post post) {
         return PostInfoRes.builder()
                 .id(post.getId())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
                 .title(post.getTitle())
                 .content(post.getContent())
-                .startDate(post.getRecruitmentStartDate())
-                .endDate(post.getRecruitmentEndDate())
+                .recruitmentStartDate(post.getRecruitmentStartDate())
+                .recruitmentEndDate(post.getRecruitmentEndDate())
+                .activityStartDate(post.getActivityStartDate())
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
                 .category(post.getCategory())

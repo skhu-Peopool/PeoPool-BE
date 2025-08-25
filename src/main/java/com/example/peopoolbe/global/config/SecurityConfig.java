@@ -34,7 +34,7 @@ public class SecurityConfig{
                 .logout(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/**", "/webjars/**", "/").permitAll()
-                        .requestMatchers("/signup", "/login", "/logout", "/token", "/codesend", "/mailcodecheck", "/forgotpwd", "/post/list").permitAll()
+                        .requestMatchers("/signup", "/login", "/logout", "/token", "/codesend", "/mailcodecheck", "/forgotpwd", "/post/list", "/post/{postId:\\d+}").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtFilter(tokenprovider), UsernamePasswordAuthenticationFilter.class)

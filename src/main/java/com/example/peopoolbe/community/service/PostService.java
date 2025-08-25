@@ -4,6 +4,7 @@ import com.example.peopoolbe.community.api.dto.request.PostAddReq;
 import com.example.peopoolbe.community.api.dto.request.PostUpdateReq;
 import com.example.peopoolbe.community.api.dto.response.PostInfoRes;
 import com.example.peopoolbe.community.api.dto.response.PostListRes;
+import com.example.peopoolbe.community.domain.Category;
 import com.example.peopoolbe.community.domain.Post;
 import com.example.peopoolbe.community.domain.Status;
 import com.example.peopoolbe.community.domain.repository.PostRepository;
@@ -35,18 +36,21 @@ public class PostService {
     public PostInfoRes addPost(PostAddReq postAddReq, MultipartFile image, Principal principal) {
         Member member = memberService.getUserByToken(principal);
 
-        checkDateStartEndOrder(postAddReq.startDate(), postAddReq.endDate());
+        checkDateStartEndOrder(postAddReq.recruitmentStartDate(), postAddReq.recruitmentEndDate());
 
-        if(postAddReq.startDate().isBefore(LocalDate.now()))
+        if(postAddReq.recruitmentStartDate().isBefore(LocalDate.now()))
             throw new IllegalArgumentException("모집 시작 날짜가 현재 날짜보다 앞섭니다.");
+        if(postAddReq.activityStartDate().isBefore(LocalDate.now()))
+            throw new IllegalArgumentException("활동 시작 날짜가 현재 날짜보다 앞섭니다.");
 
         Post post = Post.builder()
                 .title(postAddReq.title())
                 .content(postAddReq.content())
-                .recruitmentStartDate(postAddReq.startDate())
-                .recruitmentEndDate(postAddReq.endDate())
+                .recruitmentStartDate(postAddReq.recruitmentStartDate())
+                .recruitmentEndDate(postAddReq.recruitmentEndDate())
+                .activityStartDate(postAddReq.activityStartDate())
                 .maximumPeople(postAddReq.maxPeople())
-                .status(postAddReq.startDate().isEqual(LocalDate.now()) ? Status.RECRUITING : Status.UPCOMING)
+                .status(postAddReq.recruitmentStartDate().isEqual(LocalDate.now()) ? Status.RECRUITING : Status.UPCOMING)
                 .category(postAddReq.category())
                 .image(s3Service.uploadNewPostImage(image))
                 .member(member)
@@ -58,8 +62,9 @@ public class PostService {
                 .id(post.getId())
                 .title(postAddReq.title())
                 .content(postAddReq.content())
-                .startDate(postAddReq.startDate())
-                .endDate(postAddReq.endDate())
+                .recruitmentStartDate(postAddReq.recruitmentStartDate())
+                .recruitmentEndDate(postAddReq.recruitmentEndDate())
+                .activityStartDate(postAddReq.activityStartDate())
                 .maxPeople(postAddReq.maxPeople())
                 .status(post.getStatus())
                 .category(postAddReq.category())
@@ -76,8 +81,9 @@ public class PostService {
                 .id(postId)
                 .title(post.getTitle())
                 .content(post.getTitle())
-                .startDate(post.getRecruitmentStartDate())
-                .endDate(post.getRecruitmentEndDate())
+                .recruitmentStartDate(post.getRecruitmentStartDate())
+                .recruitmentEndDate(post.getRecruitmentEndDate())
+                .activityStartDate(post.getActivityStartDate())
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
                 .category(post.getCategory())
@@ -87,16 +93,14 @@ public class PostService {
                 .build();
     }
 
-    public PostListRes getPostList(String word, int page, int size, String startDate, String endDate) {
+    public PostListRes getPostList(String word, int page, int size, String startDate, String endDate, Category category, Status status) {
         Pageable pageable = PageRequest.of(page-1, size, Sort.by("id").descending());
         Page<Post> postPage;
 
         LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDate end = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        if(word.isBlank()) postPage = postRepository.searchPost(pageable, start, end);
-        else postPage = postRepository.searchPostByWord(pageable, word, start, end);
-
+        postPage = postRepository.searchPost(pageable, word, start, end, category, status);
         List<Post> postList = postPage.getContent();
 
         List<PostInfoRes> postInfoResList = postList.stream()
@@ -128,23 +132,27 @@ public class PostService {
         Post post = getPostByPostId(postId);
 
         checkWriter(member, post);
-        checkDateStartEndOrder(postUpdateReq.startDate(), postUpdateReq.endDate());
+        checkDateStartEndOrder(postUpdateReq.recruitmentStartDate(), postUpdateReq.recruitmentEndDate());
 
-        if(!post.getRecruitmentStartDate().isEqual(postUpdateReq.startDate()))
-            if(postUpdateReq.startDate().isBefore(LocalDate.now()))
-                throw new IllegalArgumentException("수정된 시작 날짜가 현재 날짜보다 앞섭니다.");
+        if(!post.getRecruitmentStartDate().isEqual(postUpdateReq.recruitmentStartDate()))
+            if(postUpdateReq.recruitmentStartDate().isBefore(LocalDate.now()))
+                throw new IllegalArgumentException("수정된 모집 시작 날짜가 현재 날짜보다 앞섭니다.");
+        if(!post.getActivityStartDate().isEqual(postUpdateReq.activityStartDate()))
+            if(postUpdateReq.activityStartDate().isBefore(LocalDate.now()))
+                throw new IllegalArgumentException("수정된 활동 시작 날짜가 현재 날짜보다 앞섭니다.");
 
-        post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.startDate(),
-                postUpdateReq.endDate(), postUpdateReq.maxPeople(), postUpdateReq.status(),
-                postUpdateReq.category(), s3Service.uploadExistingPostImage(image, postId));
+        post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.recruitmentStartDate(),
+                postUpdateReq.recruitmentEndDate(), postUpdateReq.activityStartDate(), postUpdateReq.maxPeople(),
+                postUpdateReq.status(), postUpdateReq.category(), s3Service.uploadExistingPostImage(image, postId));
         postRepository.save(post);
 
         return PostInfoRes.builder()
                 .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
-                .startDate(post.getRecruitmentStartDate())
-                .endDate(post.getRecruitmentEndDate())
+                .recruitmentStartDate(post.getRecruitmentStartDate())
+                .recruitmentEndDate(post.getRecruitmentEndDate())
+                .activityStartDate(post.getActivityStartDate())
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
                 .category(post.getCategory())

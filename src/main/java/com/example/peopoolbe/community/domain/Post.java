@@ -30,6 +30,10 @@ public class Post extends BaseEntity {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate recruitmentEndDate;
 
+    @Column(name = "ACTIVITY_START_DATE")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate activityStartDate;
+
     @Column(name = "MAXIMUM_PEOPLE")
     private Integer maximumPeople;
 
@@ -49,11 +53,14 @@ public class Post extends BaseEntity {
     private Member member;
 
     @Builder
-    public Post(String title, String content, LocalDate recruitmentStartDate, LocalDate recruitmentEndDate, Integer maximumPeople, Status status, Category category, String image, Member member) {
+    public Post(String title, String content, LocalDate recruitmentStartDate,
+                LocalDate recruitmentEndDate, LocalDate activityStartDate, Integer maximumPeople,
+                Status status, Category category, String image, Member member) {
         this.title = title;
         this.content = content;
         this.recruitmentStartDate = recruitmentStartDate;
         this.recruitmentEndDate = recruitmentEndDate;
+        this.activityStartDate = activityStartDate;
         this.maximumPeople = maximumPeople;
         this.status = status;
         this.member = member;
@@ -61,11 +68,14 @@ public class Post extends BaseEntity {
         this.image = image;
     }
 
-    public void update(String title, String content, LocalDate recruitmentStartDate, LocalDate recruitmentEndDate, Integer maximumPeople, Status status, Category category, String image) {
+    public void update(String title, String content, LocalDate recruitmentStartDate,
+                       LocalDate recruitmentEndDate, LocalDate activityStartDate, Integer maximumPeople,
+                       Status status, Category category, String image) {
         this.title = title;
         this.content = content;
         this.recruitmentStartDate = recruitmentStartDate;
         this.recruitmentEndDate = recruitmentEndDate;
+        this.activityStartDate = activityStartDate;
         this.maximumPeople = maximumPeople;
         this.status = status;
         this.category = category;

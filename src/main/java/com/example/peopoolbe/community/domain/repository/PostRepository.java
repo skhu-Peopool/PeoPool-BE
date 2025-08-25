@@ -13,10 +13,19 @@ import java.time.LocalDate;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    @Query("SELECT p FROM Post p LEFT JOIN p.member m " +
-            "WHERE ( (p.title LIKE CONCAT('%', :query, '%') " +
-            "OR p.content LIKE CONCAT('%', :query, '%') " +
-            "OR m.nickname LIKE CONCAT('%', :query, '%')) " +
+    @Query(value = "SELECT DISTINCT p FROM Post p " +
+            "LEFT JOIN p.member m " +
+            "WHERE ( (:query IS NULL OR :query = '' " +
+            "OR LOWER(p.content) LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "OR LOWER(m.nickname) LIKE LOWER(CONCAT('%', :query, '%'))) " +
+            "AND p.recruitmentEndDate BETWEEN :start AND :end " +
+            "AND (:category IS NULL OR p.category = :category) " +
+            "AND (:status IS NULL OR p.status = :status) ) ",
+    countQuery = "SELECT COUNT(DISTINCT p) FROM Post p " +
+            "LEFT JOIN p.member m " +
+            "WHERE ( (:query IS NULL OR :query = '' " +
+            "OR LOWER(p.content) LIKE LOWER(CONCAT('%', :query, '%')) " +
+            "OR LOWER(m.nickname) LIKE LOWER(CONCAT('%', :query, '%'))) " +
             "AND p.recruitmentEndDate BETWEEN :start AND :end " +
             "AND (:category IS NULL OR p.category = :category) " +
             "AND (:status IS NULL OR p.status = :status) ) ")

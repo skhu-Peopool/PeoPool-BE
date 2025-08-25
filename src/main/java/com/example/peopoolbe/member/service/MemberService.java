@@ -88,10 +88,16 @@ public class MemberService {
         Member member = getUserByToken(principal);
 
         return UserInfo.builder()
+                .createdAt(member.getCreatedAt())
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
                 .email(member.getEmail())
+                .introduction(member.getIntroduction())
+                .hashtag(member.getHashtag())
+                .birthday(member.getBirthday())
                 .profileVisible(member.getProfileVisible())
+                .activityVisible(member.getActivityVisible())
+                .postVisible(member.getPostVisible())
                 .build();
     }
 
@@ -99,6 +105,9 @@ public class MemberService {
         Member member = getUserByToken(principal);
 
         member.updateProfile(memberProfileUpdateReq.nickname(),
+                memberProfileUpdateReq.introduction(),
+                memberProfileUpdateReq.hashtag(),
+                memberProfileUpdateReq.birthday(),
                 memberProfileUpdateReq.profileVisible(),
                 memberProfileUpdateReq.activityVisible(),
                 memberProfileUpdateReq.postVisible());
@@ -106,9 +115,13 @@ public class MemberService {
         memberRepository.save(member);
 
         return UserInfo.builder()
+                .createdAt(member.getCreatedAt())
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
                 .email(member.getEmail())
+                .introduction(member.getIntroduction())
+                .hashtag(member.getHashtag())
+                .birthday(member.getBirthday())
                 .profileVisible(member.getProfileVisible())
                 .activityVisible(member.getActivityVisible())
                 .postVisible(member.getPostVisible())

@@ -64,6 +64,7 @@ public class PostService {
                 .status(post.getStatus())
                 .category(postAddReq.category())
                 .image(post.getImage())
+                .writerId(member.getId())
                 .writerName(member.getNickname())
                 .build();
     }
@@ -80,6 +81,8 @@ public class PostService {
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
                 .category(post.getCategory())
+                .image(post.getImage())
+                .writerId(post.getMember().getId())
                 .writerName(post.getMember().getNickname())
                 .build();
     }
@@ -146,7 +149,8 @@ public class PostService {
                 .status(post.getStatus())
                 .category(post.getCategory())
                 .image(post.getImage())
-                .writerName(post.getMember().getNickname())
+                .writerId(member.getId())
+                .writerName(member.getNickname())
                 .build();
     }
 

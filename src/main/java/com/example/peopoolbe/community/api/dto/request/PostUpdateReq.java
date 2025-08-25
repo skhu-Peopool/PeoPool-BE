@@ -3,6 +3,7 @@ package com.example.peopoolbe.community.api.dto.request;
 import com.example.peopoolbe.community.domain.Category;
 import com.example.peopoolbe.community.domain.Status;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 

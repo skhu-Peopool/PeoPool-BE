@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 
@@ -40,12 +41,15 @@ public class Post extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Category category;
 
+    @Column(name = "POST_IMAGE")
+    private String image;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
     @Builder
-    public Post(String title, String content, LocalDate recruitmentStartDate, LocalDate recruitmentEndDate, Integer maximumPeople, Status status, Category category, Member member) {
+    public Post(String title, String content, LocalDate recruitmentStartDate, LocalDate recruitmentEndDate, Integer maximumPeople, Status status, Category category, String image, Member member) {
         this.title = title;
         this.content = content;
         this.recruitmentStartDate = recruitmentStartDate;
@@ -54,9 +58,10 @@ public class Post extends BaseEntity {
         this.status = status;
         this.member = member;
         this.category = category;
+        this.image = image;
     }
 
-    public void update(String title, String content, LocalDate recruitmentStartDate, LocalDate recruitmentEndDate, Integer maximumPeople, Status status, Category category) {
+    public void update(String title, String content, LocalDate recruitmentStartDate, LocalDate recruitmentEndDate, Integer maximumPeople, Status status, Category category, String image) {
         this.title = title;
         this.content = content;
         this.recruitmentStartDate = recruitmentStartDate;
@@ -64,5 +69,6 @@ public class Post extends BaseEntity {
         this.maximumPeople = maximumPeople;
         this.status = status;
         this.category = category;
+        this.image = image;
     }
 }

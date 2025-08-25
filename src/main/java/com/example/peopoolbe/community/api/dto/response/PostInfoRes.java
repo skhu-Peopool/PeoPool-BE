@@ -16,8 +16,9 @@ public record PostInfoRes(
         LocalDateTime updatedAt,
         String title,
         String content,
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul") LocalDate startDate,
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul") LocalDate endDate,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul") LocalDate recruitmentStartDate,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul") LocalDate recruitmentEndDate,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul") LocalDate activityStartDate,
         Integer maxPeople,
         Status status,
         Category category,
@@ -32,8 +33,9 @@ public record PostInfoRes(
                 .updatedAt(post.getUpdatedAt())
                 .title(post.getTitle())
                 .content(post.getContent())
-                .startDate(post.getRecruitmentStartDate())
-                .endDate(post.getRecruitmentEndDate())
+                .recruitmentStartDate(post.getRecruitmentStartDate())
+                .recruitmentEndDate(post.getRecruitmentEndDate())
+                .activityStartDate(post.getActivityStartDate())
                 .maxPeople(post.getMaximumPeople())
                 .status(post.getStatus())
                 .category(post.getCategory())

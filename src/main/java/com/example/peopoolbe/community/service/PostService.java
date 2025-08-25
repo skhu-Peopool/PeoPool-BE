@@ -4,6 +4,7 @@ import com.example.peopoolbe.community.api.dto.request.PostAddReq;
 import com.example.peopoolbe.community.api.dto.request.PostUpdateReq;
 import com.example.peopoolbe.community.api.dto.response.PostInfoRes;
 import com.example.peopoolbe.community.api.dto.response.PostListRes;
+import com.example.peopoolbe.community.domain.Category;
 import com.example.peopoolbe.community.domain.Post;
 import com.example.peopoolbe.community.domain.Status;
 import com.example.peopoolbe.community.domain.repository.PostRepository;
@@ -92,16 +93,14 @@ public class PostService {
                 .build();
     }
 
-    public PostListRes getPostList(String word, int page, int size, String startDate, String endDate) {
+    public PostListRes getPostList(String word, int page, int size, String startDate, String endDate, Category category, Status status) {
         Pageable pageable = PageRequest.of(page-1, size, Sort.by("id").descending());
         Page<Post> postPage;
 
         LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDate end = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        if(word.isBlank()) postPage = postRepository.searchPost(pageable, start, end);
-        else postPage = postRepository.searchPostByWord(pageable, word, start, end);
-
+        postPage = postRepository.searchPost(pageable, word, start, end, category, status);
         List<Post> postList = postPage.getContent();
 
         List<PostInfoRes> postInfoResList = postList.stream()

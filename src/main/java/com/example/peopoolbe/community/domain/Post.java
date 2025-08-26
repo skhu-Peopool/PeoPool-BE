@@ -81,4 +81,8 @@ public class Post extends BaseEntity {
         this.category = category;
         this.image = image;
     }
+
+    public void updateStatus(Status status){
+        this.status = status;
+    }
 }

@@ -83,15 +83,22 @@ public class Member extends BaseEntity {
         this.postVisible = postVisible;
     }
 
-    public void updateProfile(String nickname, String introduction, String hashtag,
-                              LocalDate birthday, ViewStatus profileVisible, ViewStatus activityVisible,
-                              ViewStatus postVisible) {
+    public void updateProfile(String nickname, String introduction, String hashtag, LocalDate birthday) {
         this.nickname = nickname;
         this.introduction = introduction;
         this.hashtag = hashtag;
         this.birthday = birthday;
+    }
+
+    public void updateProfileVisibility(ViewStatus profileVisible) {
         this.profileVisible = profileVisible;
+    }
+
+    public void updateActivityVisibility(ViewStatus activityVisible) {
         this.activityVisible = activityVisible;
+    }
+
+    public void updatePostVisibility(ViewStatus postVisible) {
         this.postVisible = postVisible;
     }
 

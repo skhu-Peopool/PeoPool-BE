@@ -5,6 +5,7 @@ import com.example.peopoolbe.global.s3.service.S3Service;
 import com.example.peopoolbe.member.api.dto.request.*;
 import com.example.peopoolbe.global.jwt.api.dto.TokenResDto;
 import com.example.peopoolbe.member.api.dto.response.UserInfo;
+import com.example.peopoolbe.member.domain.ViewStatus;
 import com.example.peopoolbe.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -61,9 +62,42 @@ public class MemberController {
             @ApiResponse(responseCode = "403", description = "엑세스토큰 없음"),
             @ApiResponse(responseCode = "500", description = "뭔가 하나 안넣음")
     })
-    @PatchMapping("/update")
+    @PatchMapping("/update/profile")
     public ResponseEntity<UserInfo> updateUserInfo(Principal principal, @RequestBody MemberProfileUpdateReq memberProfileUpdateReq) {
         return ResponseEntity.ok(memberService.updateUserInfo(principal, memberProfileUpdateReq));
+    }
+
+    @Operation(summary = "유저 프로필 공개여부 수정", description = "다른 사람 찾기 페이지에 보여줄지에 대한 프로필 공개 여부 수정")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "403", description = "엑세스토큰 없음"),
+            @ApiResponse(responseCode = "500", description = "뭔가 하나 안넣음")
+    })
+    @PatchMapping("/update/profilevisible")
+    public ResponseEntity<ViewStatus> updateProfileVisibility(Principal principal, @RequestBody MemberVisibilityUpdateReq memberVisibilityUpdateReq) {
+        return ResponseEntity.ok(memberService.updateProfileVisibility(principal, memberVisibilityUpdateReq));
+    }
+
+    @Operation(summary = "유저 활동 공개여부 수정", description = "타인이 프로필 진입시 사용자의 활동 공개 여부")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "403", description = "엑세스토큰 없음"),
+            @ApiResponse(responseCode = "500", description = "뭔가 하나 안넣음")
+    })
+    @PatchMapping("/update/activityvisible")
+    public ResponseEntity<ViewStatus> updateActivityVisibility(Principal principal, @RequestBody MemberVisibilityUpdateReq memberVisibilityUpdateReq) {
+        return ResponseEntity.ok(memberService.updateActivityVisibility(principal, memberVisibilityUpdateReq));
+    }
+
+    @Operation(summary = "유저 게시글 공개여부 수정", description = "타인이 프로필 진입시 사용자가 작성한 게시글 공개 여부")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "403", description = "엑세스토큰 없음"),
+            @ApiResponse(responseCode = "500", description = "뭔가 하나 안넣음")
+    })
+    @PatchMapping("/update/postvisible")
+    public ResponseEntity<ViewStatus> updatePostVisiblity(Principal principal, @RequestBody MemberVisibilityUpdateReq memberVisibilityUpdateReq) {
+        return ResponseEntity.ok(memberService.updatePostVisibility(principal, memberVisibilityUpdateReq));
     }
 
     @Operation(summary = "프로필 수정 - 유저 암호 변경", description = "프로필 수정 페이지에서 암호 변경")

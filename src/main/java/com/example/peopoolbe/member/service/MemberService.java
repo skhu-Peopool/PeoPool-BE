@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
-import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -107,10 +106,7 @@ public class MemberService {
         member.updateProfile(memberProfileUpdateReq.nickname(),
                 memberProfileUpdateReq.introduction(),
                 memberProfileUpdateReq.hashtag(),
-                memberProfileUpdateReq.birthday(),
-                memberProfileUpdateReq.profileVisible(),
-                memberProfileUpdateReq.activityVisible(),
-                memberProfileUpdateReq.postVisible());
+                memberProfileUpdateReq.birthday());
 
         memberRepository.save(member);
 
@@ -126,6 +122,30 @@ public class MemberService {
                 .activityVisible(member.getActivityVisible())
                 .postVisible(member.getPostVisible())
                 .build();
+    }
+
+    public ViewStatus updateProfileVisibility(Principal principal, MemberVisibilityUpdateReq memberVisibilityUpdateReq) {
+        Member member = getUserByToken(principal);
+        member.updateProfileVisibility(memberVisibilityUpdateReq.visible());
+        memberRepository.save(member);
+
+        return member.getProfileVisible();
+    }
+
+    public ViewStatus updateActivityVisibility(Principal principal, MemberVisibilityUpdateReq memberVisibilityUpdateReq) {
+        Member member = getUserByToken(principal);
+        member.updateActivityVisibility(memberVisibilityUpdateReq.visible());
+        memberRepository.save(member);
+
+        return member.getActivityVisible();
+    }
+
+    public ViewStatus updatePostVisibility(Principal principal, MemberVisibilityUpdateReq memberVisibilityUpdateReq) {
+        Member member = getUserByToken(principal);
+        member.updatePostVisibility(memberVisibilityUpdateReq.visible());
+        memberRepository.save(member);
+
+        return member.getPostVisible();
     }
 
     public void changePwd(MemberPwdForgotReq memberPwdForgotReq) {

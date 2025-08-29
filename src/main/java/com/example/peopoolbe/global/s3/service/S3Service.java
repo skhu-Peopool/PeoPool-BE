@@ -61,7 +61,7 @@ public class S3Service {
     }
 
     public String uploadNewPostImage(MultipartFile multipartFile) {
-        if(multipartFile == null || !multipartFile.isEmpty()) {
+        if(multipartFile == null || multipartFile.isEmpty()) {
             return null;
         }
 

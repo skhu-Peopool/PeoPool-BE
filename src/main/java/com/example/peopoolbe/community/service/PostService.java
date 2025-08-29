@@ -84,7 +84,7 @@ public class PostService {
                 .updatedAt(post.getUpdatedAt())
                 .createdAt(post.getCreatedAt())
                 .title(post.getTitle())
-                .content(post.getTitle())
+                .content(post.getContent())
                 .recruitmentStartDate(post.getRecruitmentStartDate())
                 .recruitmentEndDate(post.getRecruitmentEndDate())
                 .activityStartDate(post.getActivityStartDate())

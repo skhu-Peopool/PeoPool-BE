@@ -7,11 +7,16 @@ import com.example.peopoolbe.community.api.dto.response.PostListRes;
 import com.example.peopoolbe.community.domain.Category;
 import com.example.peopoolbe.community.domain.Status;
 import com.example.peopoolbe.community.service.PostService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,15 +31,24 @@ import java.time.LocalDateTime;
 @RequestMapping("/post")
 public class PostController {
     private final PostService postService;
-
+    private final ObjectMapper objectMapper;
 
     @Operation(summary = "게시물 등록", description = "커뮤니티에 게시물을 등록")
+    @RequestBody(
+            content = @Content(
+                    mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                    schema = @Schema(implementation = PostAddDoc.class)
+            )
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "게시물 등록 성공"),
             @ApiResponse(responseCode = "403", description = "엑세스토큰 없음")
     })
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PostInfoRes> addPost(Principal principal, @RequestPart PostAddReq postAddReq, @RequestPart MultipartFile image) {
+    public ResponseEntity<PostInfoRes> addPost(Principal principal,
+                                               @Parameter(hidden = true) @RequestPart("postAddReq") String postAddReqJson,
+                                               @Parameter(hidden = true) @RequestPart(value = "image", required = false) MultipartFile image) throws Exception {
+        PostAddReq postAddReq = objectMapper.readValue(postAddReqJson, PostAddReq.class);
         return ResponseEntity.status(HttpStatus.CREATED).body(postService.addPost(postAddReq, image, principal));
     }
 
@@ -76,13 +90,22 @@ public class PostController {
     }
 
     @Operation(summary = "게시물 수정", description = "본인이 작성한 게시물 수정")
+    @RequestBody(
+            content = @Content(
+                    mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                    schema = @Schema(implementation = PostUpdateDoc.class)
+            )
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "수정 성공"),
             @ApiResponse(responseCode = "403", description = "엑세스토큰 없음"),
             @ApiResponse(responseCode = "500", description = "수정 권한 없음")
     })
     @PatchMapping(value = "/update/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PostInfoRes> updatePost(Principal principal, @PathVariable Long postId, @RequestPart PostUpdateReq postUpdateReq, @RequestPart MultipartFile image) {
+    public ResponseEntity<PostInfoRes> updatePost(Principal principal, @PathVariable Long postId,
+                                                  @Parameter(hidden = true) @RequestPart String postUpdateReqJson,
+                                                  @Parameter(hidden = true) @RequestPart MultipartFile image) throws Exception {
+        PostUpdateReq postUpdateReq = objectMapper.readValue(postUpdateReqJson, PostUpdateReq.class);
         return ResponseEntity.ok(postService.updatePost(postId, postUpdateReq, image, principal));
     }
 
@@ -97,5 +120,21 @@ public class PostController {
         postService.deletePost(postId, principal);
 
         return ResponseEntity.ok().build();
+    }
+    
+    class PostAddDoc {
+        @Schema(required = true, description = "게시글 JSON 본문")
+        public PostAddReq postAddReq;
+
+        @Schema(type = "string", format = "binary", description = "이미지 파일(선택)")
+        public MultipartFile image;
+    }
+    
+    class PostUpdateDoc{
+        @Schema(required = true, description = "수정 JSON 본문")
+        public PostUpdateReq postUpdateReq;
+
+        @Schema(type = "string", format = "binary", description = "이미지 파일(선택)")
+        public MultipartFile image;
     }
 }

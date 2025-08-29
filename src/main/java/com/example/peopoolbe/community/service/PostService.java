@@ -60,6 +60,8 @@ public class PostService {
 
         return PostInfoRes.builder()
                 .id(post.getId())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
                 .title(postAddReq.title())
                 .content(postAddReq.content())
                 .recruitmentStartDate(postAddReq.recruitmentStartDate())
@@ -79,6 +81,8 @@ public class PostService {
 
         return PostInfoRes.builder()
                 .id(postId)
+                .updatedAt(post.getUpdatedAt())
+                .createdAt(post.getCreatedAt())
                 .title(post.getTitle())
                 .content(post.getTitle())
                 .recruitmentStartDate(post.getRecruitmentStartDate())
@@ -148,6 +152,8 @@ public class PostService {
 
         return PostInfoRes.builder()
                 .id(post.getId())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .recruitmentStartDate(post.getRecruitmentStartDate())

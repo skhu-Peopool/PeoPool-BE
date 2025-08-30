@@ -87,6 +87,7 @@ public class MemberService {
         Member member = getUserByToken(principal);
 
         return UserInfo.builder()
+                .id(member.getId())
                 .createdAt(member.getCreatedAt())
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
@@ -111,6 +112,7 @@ public class MemberService {
         memberRepository.save(member);
 
         return UserInfo.builder()
+                .id(member.getId())
                 .createdAt(member.getCreatedAt())
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
@@ -165,6 +167,7 @@ public class MemberService {
         memberRepository.save(member);
 
         return UserInfo.builder()
+                .id(member.getId())
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
                 .email(member.getEmail())

@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Builder
 public record UserInfo(
+        Long id,
         LocalDateTime createdAt,
         String nickname,
         String profileImage,
@@ -22,6 +23,7 @@ public record UserInfo(
 ){
     public static UserInfo from(Member member) {
         return UserInfo.builder()
+                .id(member.getId())
                 .createdAt(member.getCreatedAt())
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())

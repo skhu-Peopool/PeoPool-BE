@@ -107,6 +107,8 @@ public class PostService {
         postPage = postRepository.searchPost(pageable, word, start, end, category, status);
         List<Post> postList = postPage.getContent();
         long totalCount = postPage.getTotalElements();
+        int totalPages = postPage.getTotalPages();
+        int currentPage = postPage.getNumber() + 1;
 
         List<PostInfoRes> postInfoResList = postList.stream()
                 .map(PostInfoRes::from)
@@ -114,6 +116,8 @@ public class PostService {
 
         return PostListRes.builder()
                 .totalCount(totalCount)
+                .totalPages(totalPages)
+                .currentPage(currentPage)
                 .postList(postInfoResList)
                 .build();
     }

@@ -106,12 +106,16 @@ public class PostService {
 
         postPage = postRepository.searchPost(pageable, word, start, end, category, status);
         List<Post> postList = postPage.getContent();
+        long totalCount = postPage.getTotalElements();
 
         List<PostInfoRes> postInfoResList = postList.stream()
                 .map(PostInfoRes::from)
                 .toList();
 
-        return PostListRes.fromPostList(postInfoResList);
+        return PostListRes.builder()
+                .totalCount(totalCount)
+                .postList(postInfoResList)
+                .build();
     }
 
 //    public PostListRes searchPost(String word, int page, int size, String startDateTime, String endDateTime){

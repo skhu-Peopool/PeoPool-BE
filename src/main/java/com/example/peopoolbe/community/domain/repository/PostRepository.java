@@ -16,6 +16,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT DISTINCT p FROM Post p " +
             "LEFT JOIN p.member m " +
             "WHERE ( (:query IS NULL OR :query = '' " +
+            "OR LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%'))" +
             "OR LOWER(p.content) LIKE LOWER(CONCAT('%', :query, '%')) " +
             "OR LOWER(m.nickname) LIKE LOWER(CONCAT('%', :query, '%'))) " +
             "AND p.recruitmentEndDate BETWEEN :start AND :end " +
@@ -24,6 +25,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     countQuery = "SELECT COUNT(DISTINCT p) FROM Post p " +
             "LEFT JOIN p.member m " +
             "WHERE ( (:query IS NULL OR :query = '' " +
+            "OR LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%'))" +
             "OR LOWER(p.content) LIKE LOWER(CONCAT('%', :query, '%')) " +
             "OR LOWER(m.nickname) LIKE LOWER(CONCAT('%', :query, '%'))) " +
             "AND p.recruitmentEndDate BETWEEN :start AND :end " +

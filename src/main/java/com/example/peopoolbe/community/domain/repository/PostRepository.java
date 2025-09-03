@@ -17,7 +17,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN p.member m " +
             "WHERE ( (:query IS NULL OR :query = '' " +
             "OR LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%'))" +
-            "OR LOWER(p.content) LIKE LOWER(CONCAT('%', :query, '%')) " +
+//            "OR LOWER(p.content) LIKE LOWER(CONCAT('%', :query, '%')) " +
             "OR LOWER(m.nickname) LIKE LOWER(CONCAT('%', :query, '%'))) " +
             "AND p.recruitmentEndDate BETWEEN :start AND :end " +
             "AND (:category IS NULL OR p.category = :category) " +
@@ -26,7 +26,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN p.member m " +
             "WHERE ( (:query IS NULL OR :query = '' " +
             "OR LOWER(p.title) LIKE LOWER(CONCAT('%', :query, '%'))" +
-            "OR LOWER(p.content) LIKE LOWER(CONCAT('%', :query, '%')) " +
+//            "OR LOWER(p.content) LIKE LOWER(CONCAT('%', :query, '%')) " +
             "OR LOWER(m.nickname) LIKE LOWER(CONCAT('%', :query, '%'))) " +
             "AND p.recruitmentEndDate BETWEEN :start AND :end " +
             "AND (:category IS NULL OR p.category = :category) " +

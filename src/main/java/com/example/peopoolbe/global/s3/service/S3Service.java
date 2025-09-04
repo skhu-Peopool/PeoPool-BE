@@ -73,7 +73,7 @@ public class S3Service {
     public String uploadExistingPostImage(MultipartFile multipartFile, Long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if(multipartFile.isEmpty()) {
+        if(multipartFile == null || multipartFile.isEmpty()) {
             return null;
         }
 

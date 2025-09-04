@@ -103,8 +103,8 @@ public class PostController {
     })
     @PatchMapping(value = "/update/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PostInfoRes> updatePost(Principal principal, @PathVariable Long postId,
-                                                  @Parameter(hidden = true) @RequestPart String postUpdateReqJson,
-                                                  @Parameter(hidden = true) @RequestPart MultipartFile image) throws Exception {
+                                                  @Parameter(hidden = true) @RequestPart("postUpdateReq") String postUpdateReqJson,
+                                                  @Parameter(hidden = true) @RequestPart(value = "image", required = false) MultipartFile image) throws Exception {
         PostUpdateReq postUpdateReq = objectMapper.readValue(postUpdateReqJson, PostUpdateReq.class);
         return ResponseEntity.ok(postService.updatePost(postId, postUpdateReq, image, principal));
     }

@@ -27,6 +27,12 @@ public class SchedulerService {
                     post.updateStatus(Status.RECRUITED);
                     postRepository.save(post);
                 }
+
+            if(post.getRecruitmentStartDate().isEqual(LocalDate.now()))
+                if(post.getStatus() != Status.RECRUITING) {
+                    post.updateStatus(Status.RECRUITING);
+                    postRepository.save(post);
+                }
         }
     }
 }

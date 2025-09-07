@@ -6,7 +6,7 @@ import com.example.peopoolbe.community.post.api.dto.response.PostInfoRes;
 import com.example.peopoolbe.community.post.api.dto.response.PostListRes;
 import com.example.peopoolbe.community.post.domain.Category;
 import com.example.peopoolbe.community.post.domain.Post;
-import com.example.peopoolbe.community.post.domain.Status;
+import com.example.peopoolbe.community.post.domain.PostStatus;
 import com.example.peopoolbe.community.post.domain.repository.PostRepository;
 import com.example.peopoolbe.global.s3.service.S3Service;
 import com.example.peopoolbe.member.domain.Member;
@@ -50,7 +50,7 @@ public class PostService {
                 .recruitmentEndDate(postAddReq.recruitmentEndDate())
                 .activityStartDate(postAddReq.activityStartDate())
                 .maximumPeople(postAddReq.maxPeople())
-                .status(postAddReq.recruitmentStartDate().isEqual(LocalDate.now()) ? Status.RECRUITING : Status.UPCOMING)
+                .postStatus(postAddReq.recruitmentStartDate().isEqual(LocalDate.now()) ? PostStatus.RECRUITING : PostStatus.UPCOMING)
                 .category(postAddReq.category())
                 .image(s3Service.uploadNewPostImage(image))
                 .member(member)
@@ -68,7 +68,7 @@ public class PostService {
                 .recruitmentEndDate(postAddReq.recruitmentEndDate())
                 .activityStartDate(postAddReq.activityStartDate())
                 .maxPeople(postAddReq.maxPeople())
-                .status(post.getStatus())
+                .postStatus(post.getPostStatus())
                 .category(postAddReq.category())
                 .image(post.getImage())
                 .writerId(member.getId())
@@ -89,7 +89,7 @@ public class PostService {
                 .recruitmentEndDate(post.getRecruitmentEndDate())
                 .activityStartDate(post.getActivityStartDate())
                 .maxPeople(post.getMaximumPeople())
-                .status(post.getStatus())
+                .postStatus(post.getPostStatus())
                 .category(post.getCategory())
                 .image(post.getImage())
                 .writerId(post.getMember().getId())
@@ -97,14 +97,14 @@ public class PostService {
                 .build();
     }
 
-    public PostListRes getPostList(String word, int page, int size, String startDate, String endDate, Category category, Status status) {
+    public PostListRes getPostList(String word, int page, int size, String startDate, String endDate, Category category, PostStatus postStatus) {
         Pageable pageable = PageRequest.of(page-1, size, Sort.by("id").descending());
         Page<Post> postPage;
 
         LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDate end = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        postPage = postRepository.searchPost(pageable, word, start, end, category, status);
+        postPage = postRepository.searchPost(pageable, word, start, end, category, postStatus);
         List<Post> postList = postPage.getContent();
         long totalCount = postPage.getTotalElements();
         int totalPages = postPage.getTotalPages();
@@ -155,7 +155,7 @@ public class PostService {
 
         post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.recruitmentStartDate(),
                 postUpdateReq.recruitmentEndDate(), postUpdateReq.activityStartDate(), postUpdateReq.maxPeople(),
-                postUpdateReq.status(), postUpdateReq.category(), s3Service.uploadExistingPostImage(image, postId));
+                postUpdateReq.postStatus(), postUpdateReq.category(), s3Service.uploadExistingPostImage(image, postId));
         postRepository.save(post);
 
         return PostInfoRes.builder()
@@ -168,7 +168,7 @@ public class PostService {
                 .recruitmentEndDate(post.getRecruitmentEndDate())
                 .activityStartDate(post.getActivityStartDate())
                 .maxPeople(post.getMaximumPeople())
-                .status(post.getStatus())
+                .postStatus(post.getPostStatus())
                 .category(post.getCategory())
                 .image(post.getImage())
                 .writerId(member.getId())
@@ -189,7 +189,7 @@ public class PostService {
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시물"));
     }
 
-    private void checkWriter(Member member, Post post) {
+    public void checkWriter(Member member, Post post) {
         if(!post.getMember().getId().equals(member.getId())) {
             throw new IllegalArgumentException("접근 권한 없음");
         }

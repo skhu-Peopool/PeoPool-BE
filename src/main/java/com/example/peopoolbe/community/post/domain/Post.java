@@ -38,7 +38,7 @@ public class Post extends BaseEntity {
 
     @Column(name = "POST_STATUS", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private PostStatus postStatus;
 
     @Column(name = "POST_CATEGORY", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -54,14 +54,14 @@ public class Post extends BaseEntity {
     @Builder
     public Post(String title, String content, LocalDate recruitmentStartDate,
                 LocalDate recruitmentEndDate, LocalDate activityStartDate, Integer maximumPeople,
-                Status status, Category category, String image, Member member) {
+                PostStatus postStatus, Category category, String image, Member member) {
         this.title = title;
         this.content = content;
         this.recruitmentStartDate = recruitmentStartDate;
         this.recruitmentEndDate = recruitmentEndDate;
         this.activityStartDate = activityStartDate;
         this.maximumPeople = maximumPeople;
-        this.status = status;
+        this.postStatus = postStatus;
         this.member = member;
         this.category = category;
         this.image = image;
@@ -69,19 +69,19 @@ public class Post extends BaseEntity {
 
     public void update(String title, String content, LocalDate recruitmentStartDate,
                        LocalDate recruitmentEndDate, LocalDate activityStartDate, Integer maximumPeople,
-                       Status status, Category category, String image) {
+                       PostStatus postStatus, Category category, String image) {
         this.title = title;
         this.content = content;
         this.recruitmentStartDate = recruitmentStartDate;
         this.recruitmentEndDate = recruitmentEndDate;
         this.activityStartDate = activityStartDate;
         this.maximumPeople = maximumPeople;
-        this.status = status;
+        this.postStatus = postStatus;
         this.category = category;
         this.image = image;
     }
 
-    public void updateStatus(Status status){
-        this.status = status;
+    public void updateStatus(PostStatus postStatus){
+        this.postStatus = postStatus;
     }
 }

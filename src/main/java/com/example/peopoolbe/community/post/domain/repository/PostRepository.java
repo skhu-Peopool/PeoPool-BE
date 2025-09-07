@@ -1,8 +1,8 @@
-package com.example.peopoolbe.community.domain.repository;
+package com.example.peopoolbe.community.post.domain.repository;
 
-import com.example.peopoolbe.community.domain.Category;
-import com.example.peopoolbe.community.domain.Post;
-import com.example.peopoolbe.community.domain.Status;
+import com.example.peopoolbe.community.post.domain.Category;
+import com.example.peopoolbe.community.post.domain.Post;
+import com.example.peopoolbe.community.post.domain.Status;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

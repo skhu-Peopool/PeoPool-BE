@@ -1,15 +1,13 @@
 package com.example.peopoolbe.global.scheduler;
 
-import com.example.peopoolbe.community.domain.Post;
-import com.example.peopoolbe.community.domain.Status;
-import com.example.peopoolbe.community.domain.repository.PostRepository;
-import com.example.peopoolbe.community.service.PostService;
+import com.example.peopoolbe.community.post.domain.Post;
+import com.example.peopoolbe.community.post.domain.Status;
+import com.example.peopoolbe.community.post.domain.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Component

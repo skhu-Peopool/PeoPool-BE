@@ -1,13 +1,12 @@
-package com.example.peopoolbe.community.api;
+package com.example.peopoolbe.community.post.api;
 
-import com.example.peopoolbe.community.api.dto.request.PostAddReq;
-import com.example.peopoolbe.community.api.dto.request.PostUpdateReq;
-import com.example.peopoolbe.community.api.dto.response.PostInfoRes;
-import com.example.peopoolbe.community.api.dto.response.PostListRes;
-import com.example.peopoolbe.community.domain.Category;
-import com.example.peopoolbe.community.domain.Status;
-import com.example.peopoolbe.community.service.PostService;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.peopoolbe.community.post.api.dto.request.PostAddReq;
+import com.example.peopoolbe.community.post.api.dto.request.PostUpdateReq;
+import com.example.peopoolbe.community.post.api.dto.response.PostInfoRes;
+import com.example.peopoolbe.community.post.api.dto.response.PostListRes;
+import com.example.peopoolbe.community.post.domain.Category;
+import com.example.peopoolbe.community.post.domain.Status;
+import com.example.peopoolbe.community.post.service.PostService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor

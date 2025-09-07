@@ -1,4 +1,4 @@
-package com.example.peopoolbe.community.domain;
+package com.example.peopoolbe.community.post.domain;
 
 public enum Status {
     UPCOMING, //모집 예정

@@ -1,8 +1,8 @@
-package com.example.peopoolbe.community.api.dto.response;
+package com.example.peopoolbe.community.post.api.dto.response;
 
-import com.example.peopoolbe.community.domain.Category;
-import com.example.peopoolbe.community.domain.Post;
-import com.example.peopoolbe.community.domain.Status;
+import com.example.peopoolbe.community.post.domain.Category;
+import com.example.peopoolbe.community.post.domain.Post;
+import com.example.peopoolbe.community.post.domain.Status;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 

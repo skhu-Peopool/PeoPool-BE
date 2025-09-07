@@ -1,13 +1,13 @@
-package com.example.peopoolbe.community.service;
+package com.example.peopoolbe.community.post.service;
 
-import com.example.peopoolbe.community.api.dto.request.PostAddReq;
-import com.example.peopoolbe.community.api.dto.request.PostUpdateReq;
-import com.example.peopoolbe.community.api.dto.response.PostInfoRes;
-import com.example.peopoolbe.community.api.dto.response.PostListRes;
-import com.example.peopoolbe.community.domain.Category;
-import com.example.peopoolbe.community.domain.Post;
-import com.example.peopoolbe.community.domain.Status;
-import com.example.peopoolbe.community.domain.repository.PostRepository;
+import com.example.peopoolbe.community.post.api.dto.request.PostAddReq;
+import com.example.peopoolbe.community.post.api.dto.request.PostUpdateReq;
+import com.example.peopoolbe.community.post.api.dto.response.PostInfoRes;
+import com.example.peopoolbe.community.post.api.dto.response.PostListRes;
+import com.example.peopoolbe.community.post.domain.Category;
+import com.example.peopoolbe.community.post.domain.Post;
+import com.example.peopoolbe.community.post.domain.Status;
+import com.example.peopoolbe.community.post.domain.repository.PostRepository;
 import com.example.peopoolbe.global.s3.service.S3Service;
 import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.service.MemberService;

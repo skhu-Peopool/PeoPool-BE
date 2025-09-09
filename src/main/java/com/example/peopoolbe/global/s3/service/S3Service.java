@@ -4,8 +4,8 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.example.peopoolbe.community.domain.Post;
-import com.example.peopoolbe.community.domain.repository.PostRepository;
+import com.example.peopoolbe.community.post.domain.Post;
+import com.example.peopoolbe.community.post.domain.repository.PostRepository;
 import com.example.peopoolbe.global.s3.dto.S3ImageUploadRes;
 import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.domain.repository.MemberRepository;
@@ -74,7 +74,8 @@ public class S3Service {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         if(multipartFile == null || multipartFile.isEmpty()) {
-            return null;
+//            return null;
+            return post.getImage();
         }
 
         String formerFileName = extractFormerFileNameFromPost(post);

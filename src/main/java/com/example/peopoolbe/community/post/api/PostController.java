@@ -1,13 +1,12 @@
-package com.example.peopoolbe.community.api;
+package com.example.peopoolbe.community.post.api;
 
-import com.example.peopoolbe.community.api.dto.request.PostAddReq;
-import com.example.peopoolbe.community.api.dto.request.PostUpdateReq;
-import com.example.peopoolbe.community.api.dto.response.PostInfoRes;
-import com.example.peopoolbe.community.api.dto.response.PostListRes;
-import com.example.peopoolbe.community.domain.Category;
-import com.example.peopoolbe.community.domain.Status;
-import com.example.peopoolbe.community.service.PostService;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.peopoolbe.community.post.api.dto.request.PostAddReq;
+import com.example.peopoolbe.community.post.api.dto.request.PostUpdateReq;
+import com.example.peopoolbe.community.post.api.dto.response.PostInfoRes;
+import com.example.peopoolbe.community.post.api.dto.response.PostListRes;
+import com.example.peopoolbe.community.post.domain.Category;
+import com.example.peopoolbe.community.post.domain.PostStatus;
+import com.example.peopoolbe.community.post.service.PostService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
 
 @RestController
 @RequiredArgsConstructor
@@ -85,8 +83,8 @@ public class PostController {
                                                   @RequestParam(defaultValue = "1900-01-01") String start,
                                                   @RequestParam(defaultValue = "2100-01-01") String end,
                                                   @RequestParam(defaultValue = "") Category category,
-                                                  @RequestParam(defaultValue = "") Status status) {
-        return ResponseEntity.ok(postService.getPostList(query, page, size, start, end, category, status));
+                                                  @RequestParam(defaultValue = "") PostStatus postStatus) {
+        return ResponseEntity.ok(postService.getPostList(query, page, size, start, end, category, postStatus));
     }
 
     @Operation(summary = "게시물 수정", description = "본인이 작성한 게시물 수정")

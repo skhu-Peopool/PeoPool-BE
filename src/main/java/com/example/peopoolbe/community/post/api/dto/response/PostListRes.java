@@ -1,4 +1,4 @@
-package com.example.peopoolbe.community.api.dto.response;
+package com.example.peopoolbe.community.post.api.dto.response;
 
 import lombok.Builder;
 

@@ -1,6 +1,6 @@
 package com.example.peopoolbe.member.domain;
 
-import com.example.peopoolbe.community.domain.Post;
+import com.example.peopoolbe.community.post.domain.Post;
 import com.example.peopoolbe.global.entity.BaseEntity;
 import com.example.peopoolbe.global.jwt.domain.RefreshToken;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package com.example.peopoolbe.community.domain;
+package com.example.peopoolbe.community.post.domain;
 
 public enum Category {
     CLUB, //동아리

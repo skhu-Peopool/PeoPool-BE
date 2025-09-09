@@ -21,7 +21,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "OR LOWER(m.nickname) LIKE LOWER(CONCAT('%', :query, '%'))) " +
             "AND p.recruitmentEndDate BETWEEN :start AND :end " +
             "AND (:category IS NULL OR p.category = :category) " +
-            "AND (:status IS NULL OR p.postStatus = :status) ) ",
+            "AND (:postStatus IS NULL OR p.postStatus = :postStatus) ) ",
     countQuery = "SELECT COUNT(DISTINCT p) FROM Post p " +
             "LEFT JOIN p.member m " +
             "WHERE ( (:query IS NULL OR :query = '' " +
@@ -30,10 +30,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "OR LOWER(m.nickname) LIKE LOWER(CONCAT('%', :query, '%'))) " +
             "AND p.recruitmentEndDate BETWEEN :start AND :end " +
             "AND (:category IS NULL OR p.category = :category) " +
-            "AND (:status IS NULL OR p.postStatus = :status) ) ")
+            "AND (:postStatus IS NULL OR p.postStatus = :postStatus) ) ")
     Page<Post> searchPost(Pageable pageable, @Param("query") String query,
                                 @Param("start") LocalDate start, @Param("end") LocalDate end,
-                                @Param("category") Category category, @Param("status") PostStatus postStatus);
+                                @Param("category") Category category, @Param("postStatus") PostStatus postStatus);
 
 //    @Query("SELECT p FROM Post p LEFT JOIN p.member m " +
 //            "WHERE (p.recruitmentEndDate BETWEEN :start AND :end) " +

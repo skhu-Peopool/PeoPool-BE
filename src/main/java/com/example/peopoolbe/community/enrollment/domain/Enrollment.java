@@ -23,15 +23,24 @@ public class Enrollment extends BaseEntity {
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
+    @Column(name = "applying_comment")
+    private String comment;
+
     @Enumerated(EnumType.STRING)
     private EnrollmentStatus status;
 
     private LocalDateTime decisionAt;
 
     @Builder
-    public Enrollment(Member member, Post post, EnrollmentStatus status, LocalDateTime decisionAt) {
+    public Enrollment(Member member, Post post, EnrollmentStatus status, String comment, LocalDateTime decisionAt) {
         this.member = member;
         this.post = post;
+        this.status = status;
+        this.comment = comment;
+        this.decisionAt = decisionAt;
+    }
+
+    public void update(EnrollmentStatus status, LocalDateTime decisionAt) {
         this.status = status;
         this.decisionAt = decisionAt;
     }

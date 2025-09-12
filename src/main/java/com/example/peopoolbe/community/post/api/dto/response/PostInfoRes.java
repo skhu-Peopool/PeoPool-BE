@@ -20,6 +20,7 @@ public record PostInfoRes(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul") LocalDate recruitmentEndDate,
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul") LocalDate activityStartDate,
         Integer maxPeople,
+        Integer approvedPeople,
         PostStatus postStatus,
         Category category,
         String image,
@@ -37,6 +38,7 @@ public record PostInfoRes(
                 .recruitmentEndDate(post.getRecruitmentEndDate())
                 .activityStartDate(post.getActivityStartDate())
                 .maxPeople(post.getMaximumPeople())
+                .approvedPeople(post.getApprovedPeople())
                 .postStatus(post.getPostStatus())
                 .category(post.getCategory())
                 .image(post.getImage())

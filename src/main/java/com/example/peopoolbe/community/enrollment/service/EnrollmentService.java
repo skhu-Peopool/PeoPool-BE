@@ -105,6 +105,9 @@ public class EnrollmentService {
         enrollment.update(EnrollmentStatus.APPROVED, LocalDateTime.now());
         enrollmentRepository.save(enrollment);
 
+        post.updateApprovedPeople(enrollmentRepository.countByPostIdAndStatusIs(post.getId(), EnrollmentStatus.APPROVED) + 1);
+        postRepository.save(post);
+
         return EnrollmentApplyingRes.from(enrollment);
     }
 

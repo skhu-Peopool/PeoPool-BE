@@ -50,6 +50,7 @@ public class PostService {
                 .recruitmentEndDate(postAddReq.recruitmentEndDate())
                 .activityStartDate(postAddReq.activityStartDate())
                 .maximumPeople(postAddReq.maxPeople())
+                .approvedPeople(1) // 작성자도 팀에 승인된 인원이니 1부터 시작
                 .postStatus(postAddReq.recruitmentStartDate().isEqual(LocalDate.now()) ? PostStatus.RECRUITING : PostStatus.UPCOMING)
                 .category(postAddReq.category())
                 .image(s3Service.uploadNewPostImage(image))
@@ -58,43 +59,13 @@ public class PostService {
 
         postRepository.save(post);
 
-        return PostInfoRes.builder()
-                .id(post.getId())
-                .createdAt(post.getCreatedAt())
-                .updatedAt(post.getUpdatedAt())
-                .title(postAddReq.title())
-                .content(postAddReq.content())
-                .recruitmentStartDate(postAddReq.recruitmentStartDate())
-                .recruitmentEndDate(postAddReq.recruitmentEndDate())
-                .activityStartDate(postAddReq.activityStartDate())
-                .maxPeople(postAddReq.maxPeople())
-                .postStatus(post.getPostStatus())
-                .category(postAddReq.category())
-                .image(post.getImage())
-                .writerId(member.getId())
-                .writerName(member.getNickname())
-                .build();
+        return PostInfoRes.from(post);
     }
 
     public PostInfoRes getPostInfo(Long postId) {
         Post post = getPostByPostId(postId);
 
-        return PostInfoRes.builder()
-                .id(postId)
-                .updatedAt(post.getUpdatedAt())
-                .createdAt(post.getCreatedAt())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .recruitmentStartDate(post.getRecruitmentStartDate())
-                .recruitmentEndDate(post.getRecruitmentEndDate())
-                .activityStartDate(post.getActivityStartDate())
-                .maxPeople(post.getMaximumPeople())
-                .postStatus(post.getPostStatus())
-                .category(post.getCategory())
-                .image(post.getImage())
-                .writerId(post.getMember().getId())
-                .writerName(post.getMember().getNickname())
-                .build();
+        return PostInfoRes.from(post);
     }
 
     public PostListRes getPostList(String word, int page, int size, String startDate, String endDate, Category category, PostStatus postStatus) {
@@ -158,22 +129,7 @@ public class PostService {
                 postUpdateReq.postStatus(), postUpdateReq.category(), s3Service.uploadExistingPostImage(image, postId));
         postRepository.save(post);
 
-        return PostInfoRes.builder()
-                .id(post.getId())
-                .createdAt(post.getCreatedAt())
-                .updatedAt(post.getUpdatedAt())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .recruitmentStartDate(post.getRecruitmentStartDate())
-                .recruitmentEndDate(post.getRecruitmentEndDate())
-                .activityStartDate(post.getActivityStartDate())
-                .maxPeople(post.getMaximumPeople())
-                .postStatus(post.getPostStatus())
-                .category(post.getCategory())
-                .image(post.getImage())
-                .writerId(member.getId())
-                .writerName(member.getNickname())
-                .build();
+        return PostInfoRes.from(post);
     }
 
     public void deletePost(Long postId, Principal principal) {

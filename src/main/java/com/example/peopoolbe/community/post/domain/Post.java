@@ -39,6 +39,9 @@ public class Post extends BaseEntity {
     @Column(name = "APPROVED_PEOPLE")
     private Integer approvedPeople;
 
+    @Column(name = "APPLIED_PEOPLE")
+    private Integer appliedPeople;
+
     @Column(name = "POST_STATUS", nullable = false)
     @Enumerated(EnumType.STRING)
     private PostStatus postStatus;
@@ -57,7 +60,7 @@ public class Post extends BaseEntity {
     @Builder
     public Post(String title, String content, LocalDate recruitmentStartDate,
                 LocalDate recruitmentEndDate, LocalDate activityStartDate, Integer maximumPeople,
-                Integer approvedPeople, PostStatus postStatus, Category category, String image, Member member) {
+                Integer approvedPeople, Integer appliedPeople, PostStatus postStatus, Category category, String image, Member member) {
         this.title = title;
         this.content = content;
         this.recruitmentStartDate = recruitmentStartDate;
@@ -65,6 +68,7 @@ public class Post extends BaseEntity {
         this.activityStartDate = activityStartDate;
         this.maximumPeople = maximumPeople;
         this.approvedPeople = approvedPeople;
+        this.appliedPeople = appliedPeople;
         this.postStatus = postStatus;
         this.member = member;
         this.category = category;
@@ -90,4 +94,5 @@ public class Post extends BaseEntity {
     }
 
     public void updateApprovedPeople(Integer approvedPeople) { this.approvedPeople = approvedPeople; }
+    public void updateAppliedPeople(Integer appliedPeople) { this.appliedPeople = appliedPeople; }
 }

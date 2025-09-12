@@ -13,6 +13,7 @@ import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -43,6 +44,9 @@ public class EnrollmentService {
                 .status(EnrollmentStatus.PENDING)
                 .build();
         enrollmentRepository.save(enrollment);
+
+        post.updateAppliedPeople(enrollmentRepository.countEnrollmentByPostId(postId));
+        postRepository.save(post);
 
         return EnrollmentApplyingRes.from(enrollment);
     }
@@ -92,6 +96,9 @@ public class EnrollmentService {
         Enrollment enrollment = enrollmentRepository.findByMemberAndPost(member, post)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 신청 내역입니다."));
         enrollmentRepository.delete(enrollment);
+
+        post.updateAppliedPeople(enrollmentRepository.countEnrollmentByPostId(post.getId()));
+        postRepository.save(post);
     }
 
     public EnrollmentApplyingRes approveEnrollment(Principal principal, Long EnrollmentId) {
@@ -105,7 +112,7 @@ public class EnrollmentService {
         enrollment.update(EnrollmentStatus.APPROVED, LocalDateTime.now());
         enrollmentRepository.save(enrollment);
 
-        post.updateApprovedPeople(enrollmentRepository.countByPostIdAndStatusIs(post.getId(), EnrollmentStatus.APPROVED) + 1);
+        post.updateApprovedPeople(enrollmentRepository.countByPostIdAndStatusIs(post.getId(), EnrollmentStatus.APPROVED));
         postRepository.save(post);
 
         return EnrollmentApplyingRes.from(enrollment);

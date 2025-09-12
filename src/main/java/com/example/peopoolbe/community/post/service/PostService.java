@@ -50,7 +50,8 @@ public class PostService {
                 .recruitmentEndDate(postAddReq.recruitmentEndDate())
                 .activityStartDate(postAddReq.activityStartDate())
                 .maximumPeople(postAddReq.maxPeople())
-                .approvedPeople(1) // 작성자도 팀에 승인된 인원이니 1부터 시작
+                .approvedPeople(0) // 작성자의 기대 모집 인원은 0부터 시작임
+                .appliedPeople(0)
                 .postStatus(postAddReq.recruitmentStartDate().isEqual(LocalDate.now()) ? PostStatus.RECRUITING : PostStatus.UPCOMING)
                 .category(postAddReq.category())
                 .image(s3Service.uploadNewPostImage(image))

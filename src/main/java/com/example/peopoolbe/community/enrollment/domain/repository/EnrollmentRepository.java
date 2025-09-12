@@ -12,5 +12,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     boolean existsByMemberAndPostAndStatusIsNot(Member member, Post post, EnrollmentStatus status);
 
+    Integer countByPostIdAndStatusIs(Long postId, EnrollmentStatus status);
+
     Optional<Enrollment> findByMemberAndPost(Member member, Post post);
 }

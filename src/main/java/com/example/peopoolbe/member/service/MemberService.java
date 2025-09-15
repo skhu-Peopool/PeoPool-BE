@@ -2,6 +2,7 @@ package com.example.peopoolbe.member.service;
 
 import com.example.peopoolbe.global.jwt.domain.repository.RefreshTokenRepository;
 import com.example.peopoolbe.global.jwt.service.TokenProvider;
+import com.example.peopoolbe.global.s3.service.S3Service;
 import com.example.peopoolbe.member.api.dto.request.*;
 import com.example.peopoolbe.global.jwt.api.dto.TokenResDto;
 import com.example.peopoolbe.member.api.dto.response.UserInfo;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 
@@ -28,6 +30,7 @@ public class MemberService {
     private final TokenProvider tokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final S3Service s3Service;
 
     @Value("${cloud.aws.region.static}")
     private String region;
@@ -49,7 +52,7 @@ public class MemberService {
         memberRepository.save(member);
 
         TokenResDto tokenResDto = tokenProvider.createToken(member);
-        member.addRefreshToken(refreshTokenRepository.findByRefreshToken(tokenResDto.refreshToken()));
+//        member.addRefreshToken(refreshTokenRepository.findByRefreshToken(tokenResDto.refreshToken()));
 
         addRefreshTokenInCookie(tokenResDto, response);
 
@@ -65,7 +68,7 @@ public class MemberService {
 
         TokenResDto tokenResDto = tokenProvider.createToken(member);
 
-        member.addRefreshToken(refreshTokenRepository.findByRefreshToken(tokenResDto.refreshToken()));
+//        member.addRefreshToken(refreshTokenRepository.findByRefreshToken(tokenResDto.refreshToken()));
 
         addRefreshTokenInCookie(tokenResDto, response);
 
@@ -86,44 +89,22 @@ public class MemberService {
     public UserInfo getUserInfo(Principal principal) {
         Member member = getUserByToken(principal);
 
-        return UserInfo.builder()
-                .id(member.getId())
-                .createdAt(member.getCreatedAt())
-                .nickname(member.getNickname())
-                .profileImage(member.getProfileImage())
-                .email(member.getEmail())
-                .introduction(member.getIntroduction())
-                .hashtag(member.getHashtag())
-                .birthday(member.getBirthday())
-                .profileVisible(member.getProfileVisible())
-                .activityVisible(member.getActivityVisible())
-                .postVisible(member.getPostVisible())
-                .build();
+        return UserInfo.from(member);
     }
 
-    public UserInfo updateUserInfo(Principal principal, MemberProfileUpdateReq memberProfileUpdateReq) {
+    public UserInfo updateUserInfo(Principal principal, MemberProfileUpdateReq memberProfileUpdateReq, MultipartFile image) {
         Member member = getUserByToken(principal);
 
         member.updateProfile(memberProfileUpdateReq.nickname(),
-                memberProfileUpdateReq.introduction(),
+                memberProfileUpdateReq.mainIntroduction(),
+                memberProfileUpdateReq.subIntroduction(),
                 memberProfileUpdateReq.hashtag(),
-                memberProfileUpdateReq.birthday());
+                memberProfileUpdateReq.kakaoId(),
+                s3Service.uploadProfileImage(image, member));
 
         memberRepository.save(member);
 
-        return UserInfo.builder()
-                .id(member.getId())
-                .createdAt(member.getCreatedAt())
-                .nickname(member.getNickname())
-                .profileImage(member.getProfileImage())
-                .email(member.getEmail())
-                .introduction(member.getIntroduction())
-                .hashtag(member.getHashtag())
-                .birthday(member.getBirthday())
-                .profileVisible(member.getProfileVisible())
-                .activityVisible(member.getActivityVisible())
-                .postVisible(member.getPostVisible())
-                .build();
+        return UserInfo.from(member);
     }
 
     public ViewStatus updateProfileVisibility(Principal principal, MemberVisibilityUpdateReq memberVisibilityUpdateReq) {

@@ -1,11 +1,10 @@
 package com.example.peopoolbe.member.api.dto.request;
 
-import java.time.LocalDate;
-
 public record MemberProfileUpdateReq(
         String nickname,
-        String introduction,
+        String mainIntroduction,
+        String subIntroduction,
         String hashtag,
-        LocalDate birthday
+        String kakaoId
 ) {
 }

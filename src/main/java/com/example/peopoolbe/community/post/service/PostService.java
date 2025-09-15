@@ -76,7 +76,7 @@ public class PostService {
         LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDate end = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        postPage = postRepository.searchPost(pageable, word, start, end, category, postStatus);
+        postPage = postRepository.searchPost(pageable, word, start, end, category, postStatus, LocalDate.now().minusDays(3));
         List<Post> postList = postPage.getContent();
         long totalCount = postPage.getTotalElements();
         int totalPages = postPage.getTotalPages();

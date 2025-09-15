@@ -6,10 +6,7 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.example.peopoolbe.community.post.domain.Post;
 import com.example.peopoolbe.community.post.domain.repository.PostRepository;
-import com.example.peopoolbe.global.s3.dto.S3ImageUploadRes;
 import com.example.peopoolbe.member.domain.Member;
-import com.example.peopoolbe.member.domain.repository.MemberRepository;
-import com.example.peopoolbe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -19,7 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.Principal;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,35 +25,48 @@ import java.util.regex.Pattern;
 public class S3Service {
 
     private final AmazonS3 amazonS3;
-    private final MemberService memberService;
-    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    public S3ImageUploadRes uploadProfileImage(Principal principal, MultipartFile multipartFile) {
-        if(multipartFile.isEmpty()) {
-            return null;
+//    public S3ImageUploadRes uploadProfileImage(Principal principal, MultipartFile multipartFile) {
+//        if(multipartFile == null || multipartFile.isEmpty()) {
+//            return null;
+//        }
+//        Member member = memberService.getUserByToken(principal);
+//        String formerFileName = extractFormerFileNameFromMember(member);
+//        System.out.println(formerFileName);
+//
+//        String fileName = createFileName(multipartFile.getOriginalFilename());
+//
+//        awsImageUpload(multipartFile, fileName);
+//
+//        String url = amazonS3.getUrl(bucket, fileName).toString();
+////        member.updateImage(url);
+////        memberRepository.save(member);
+//
+//        deleteImage(formerFileName);
+//
+//        return S3ImageUploadRes.builder()
+//                .fileName(fileName)
+//                .fileUrl(url)
+//                .build();
+//    }
+    public String uploadProfileImage(MultipartFile multipartFile, Member member) {
+        if(multipartFile == null || multipartFile.isEmpty()) {
+            return member.getProfileImage();
         }
-        Member member = memberService.getUserByToken(principal);
+
         String formerFileName = extractFormerFileNameFromMember(member);
         System.out.println(formerFileName);
 
         String fileName = createFileName(multipartFile.getOriginalFilename());
-
         awsImageUpload(multipartFile, fileName);
-
-        String url = amazonS3.getUrl(bucket, fileName).toString();
-        member.updateImage(url);
-        memberRepository.save(member);
 
         deleteImage(formerFileName);
 
-        return S3ImageUploadRes.builder()
-                .fileName(fileName)
-                .fileUrl(url)
-                .build();
+        return amazonS3.getUrl(bucket, fileName).toString();
     }
 
     public String uploadNewPostImage(MultipartFile multipartFile) {

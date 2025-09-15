@@ -55,6 +55,7 @@ public class PostService {
                 .postStatus(postAddReq.recruitmentStartDate().isEqual(LocalDate.now()) ? PostStatus.RECRUITING : PostStatus.UPCOMING)
                 .category(postAddReq.category())
                 .image(s3Service.uploadNewPostImage(image))
+                .views(0)
                 .member(member)
                 .build();
 
@@ -65,6 +66,8 @@ public class PostService {
 
     public PostInfoRes getPostInfo(Long postId) {
         Post post = getPostByPostId(postId);
+        post.incrementViews();
+        postRepository.save(post);
 
         return PostInfoRes.from(post);
     }

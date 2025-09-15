@@ -15,7 +15,7 @@ public class RefreshToken extends BaseEntity {
     @Column(name = "REFRESH_TOKEN")
     private String refreshToken;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
@@ -24,8 +24,8 @@ public class RefreshToken extends BaseEntity {
         this.refreshToken = refreshToken;
         this.member = member;
     }
-
-    public void update(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
+//
+//    public void update(String refreshToken) {
+//        this.refreshToken = refreshToken;
+//    }
 }

@@ -4,7 +4,6 @@ import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.domain.ViewStatus;
 import lombok.Builder;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Builder
@@ -14,9 +13,10 @@ public record UserInfo(
         String nickname,
         String profileImage,
         String email,
-        String introduction,
+        String mainIntroduction,
+        String subIntroduction,
         String hashtag,
-        LocalDate birthday,
+        String kakaoId,
         ViewStatus profileVisible,
         ViewStatus activityVisible,
         ViewStatus postVisible
@@ -28,9 +28,10 @@ public record UserInfo(
                 .nickname(member.getNickname())
                 .profileImage(member.getProfileImage())
                 .email(member.getEmail())
-                .introduction(member.getIntroduction())
+                .mainIntroduction(member.getMainIntroduction())
+                .subIntroduction(member.getSubIntroduction())
                 .hashtag(member.getHashtag())
-                .birthday(member.getBirthday())
+                .kakaoId(member.getKakaoId())
                 .profileVisible(member.getProfileVisible())
                 .activityVisible(member.getActivityVisible())
                 .postVisible(member.getPostVisible())

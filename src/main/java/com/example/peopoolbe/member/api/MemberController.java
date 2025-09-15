@@ -1,13 +1,15 @@
 package com.example.peopoolbe.member.api;
 
-import com.example.peopoolbe.global.s3.dto.S3ImageUploadRes;
-import com.example.peopoolbe.global.s3.service.S3Service;
 import com.example.peopoolbe.member.api.dto.request.*;
 import com.example.peopoolbe.global.jwt.api.dto.TokenResDto;
 import com.example.peopoolbe.member.api.dto.response.UserInfo;
 import com.example.peopoolbe.member.domain.ViewStatus;
 import com.example.peopoolbe.member.service.MemberService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,7 +29,7 @@ import java.security.Principal;
 public class MemberController {
 
     private final MemberService memberService;
-    private final S3Service s3Service;
+    private final ObjectMapper objectMapper;
 
     @Operation(summary = "회원가입", description = "자체로그인을 통한 유저 가입")
     @ApiResponses({
@@ -57,14 +60,23 @@ public class MemberController {
     }
 
     @Operation(summary = "유저 정보 수정", description = "이름, 공개여부 수정")
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = @Content(
+                    mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                    schema = @Schema(implementation = MemberProfileUpdateDoc.class)
+            )
+    )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "수정 성공"),
             @ApiResponse(responseCode = "403", description = "엑세스토큰 없음"),
             @ApiResponse(responseCode = "500", description = "뭔가 하나 안넣음")
     })
-    @PatchMapping("/update/profile")
-    public ResponseEntity<UserInfo> updateUserInfo(Principal principal, @RequestBody MemberProfileUpdateReq memberProfileUpdateReq) {
-        return ResponseEntity.ok(memberService.updateUserInfo(principal, memberProfileUpdateReq));
+    @PatchMapping(value = "/update/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserInfo> updateUserInfo(Principal principal,
+                                                   @Parameter(hidden = true) @RequestPart("memberProfileUpdateReq") String memberProfileUpdateReqJson,
+                                                   @Parameter(hidden = true) @RequestPart(value = "image", required = false) MultipartFile image) throws Exception {
+        MemberProfileUpdateReq memberProfileUpdateReq = objectMapper.readValue(memberProfileUpdateReqJson, MemberProfileUpdateReq.class);
+        return ResponseEntity.ok(memberService.updateUserInfo(principal, memberProfileUpdateReq, image));
     }
 
     @Operation(summary = "유저 프로필 공개여부 수정", description = "다른 사람 찾기 페이지에 보여줄지에 대한 프로필 공개 여부 수정")
@@ -122,6 +134,26 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "회원가입 - 닉네임 중복 검증", description = "회원가입 시에 가입자의 닉네임이 중복되었는지 검증")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "이미 존재하면 true, 아니라면 false"),
+            @ApiResponse(responseCode = "500", description = "닉네임 안넣음")
+    })
+    @PostMapping("/checknick")
+    public ResponseEntity<Boolean> checkNickname(@RequestBody CheckNicknameDTO checkNicknameDTO) {
+        return ResponseEntity.ok(memberService.isNicknameDuplicated(checkNicknameDTO));
+    }
+
+    @Operation(summary = "회원가입 - 이메일 중복 검증", description = "회원가입 시에 가입자의 이메일이 중복되었는지 검증")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "이미 존재하면 true, 아니라면 false"),
+            @ApiResponse(responseCode = "500", description = "이메일 안넣음")
+    })
+    @PostMapping("/checkemail")
+    public ResponseEntity<Boolean> checkEmail(@RequestBody CheckEmailDTO checkEmailDTO) {
+        return ResponseEntity.ok(memberService.isEmailDuplicated(checkEmailDTO));
+    }
+
     @Operation(summary = "로그아웃", description = "유저 로그아웃")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그아웃 성공"),
@@ -133,13 +165,21 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "프로필사진 업로드", description = "유저의 프로필사진 업로드, 수정")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "사진 수정 성공"),
-            @ApiResponse(responseCode = "500", description = "Multipartfile 형식의 사진을 주지 않았을 확률이 매우 높음")
-    })
-    @PostMapping("/image")
-    public ResponseEntity<S3ImageUploadRes> uploadImage(Principal principal, MultipartFile file) {
-        return ResponseEntity.ok(s3Service.uploadProfileImage(principal, file));
+//    @Operation(summary = "프로필사진 업로드", description = "유저의 프로필사진 업로드, 수정")
+//    @ApiResponses({
+//            @ApiResponse(responseCode = "200", description = "사진 수정 성공"),
+//            @ApiResponse(responseCode = "500", description = "Multipartfile 형식의 사진을 주지 않았을 확률이 매우 높음")
+//    })
+//    @PostMapping("/image")
+//    public ResponseEntity<S3ImageUploadRes> uploadImage(Principal principal, MultipartFile file) {
+//        return ResponseEntity.ok(s3Service.uploadProfileImage(principal, file));
+//    }
+
+    class MemberProfileUpdateDoc {
+        @Schema(description = "수정 JSON 본문")
+        public MemberProfileUpdateReq memberProfileUpdateReq;
+
+        @Schema(type = "string", format = "binary", description = "이미지 파일(선택)")
+        public MultipartFile image;
     }
 }

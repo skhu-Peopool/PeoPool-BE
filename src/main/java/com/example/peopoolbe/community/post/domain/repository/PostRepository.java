@@ -21,7 +21,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "OR LOWER(m.nickname) LIKE LOWER(CONCAT('%', :query, '%'))) " +
             "AND p.recruitmentEndDate BETWEEN :start AND :end " +
             "AND (:category IS NULL OR p.category = :category) " +
-            "AND (:postStatus IS NULL OR p.postStatus = :postStatus) ) ",
+            "AND (:postStatus IS NULL OR p.postStatus = :postStatus)" +
+            "AND p.recruitmentEndDate >= :todayMinus3 )", // 마감 3일 지나면 페이징 안나오게 변경
     countQuery = "SELECT COUNT(DISTINCT p) FROM Post p " +
             "LEFT JOIN p.member m " +
             "WHERE ( (:query IS NULL OR :query = '' " +
@@ -30,10 +31,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "OR LOWER(m.nickname) LIKE LOWER(CONCAT('%', :query, '%'))) " +
             "AND p.recruitmentEndDate BETWEEN :start AND :end " +
             "AND (:category IS NULL OR p.category = :category) " +
-            "AND (:postStatus IS NULL OR p.postStatus = :postStatus) ) ")
+            "AND (:postStatus IS NULL OR p.postStatus = :postStatus) " +
+            "AND p.recruitmentEndDate >= :todayMinus3 ) ")
     Page<Post> searchPost(Pageable pageable, @Param("query") String query,
                                 @Param("start") LocalDate start, @Param("end") LocalDate end,
-                                @Param("category") Category category, @Param("postStatus") PostStatus postStatus);
+                                @Param("category") Category category, @Param("postStatus") PostStatus postStatus,
+                                @Param("todayMinus3") LocalDate todayMinus3);
 
 //    @Query("SELECT p FROM Post p LEFT JOIN p.member m " +
 //            "WHERE (p.recruitmentEndDate BETWEEN :start AND :end) " +

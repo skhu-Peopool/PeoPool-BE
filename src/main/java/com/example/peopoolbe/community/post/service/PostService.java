@@ -79,7 +79,7 @@ public class PostService {
         LocalDate start = LocalDate.parse(startDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         LocalDate end = LocalDate.parse(endDate, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        postPage = postRepository.searchPost(pageable, word, start, end, category, postStatus);
+        postPage = postRepository.searchPost(pageable, word, start, end, category, postStatus, LocalDate.now().minusDays(3));
         List<Post> postList = postPage.getContent();
         long totalCount = postPage.getTotalElements();
         int totalPages = postPage.getTotalPages();
@@ -130,6 +130,12 @@ public class PostService {
         if(!post.getActivityStartDate().isEqual(postUpdateReq.activityStartDate()))
             if(postUpdateReq.activityStartDate().isBefore(LocalDate.now()))
                 throw new IllegalArgumentException("수정된 활동 시작 날짜가 현재 날짜보다 앞섭니다.");
+        if(post.getRecruitmentStartDate().isBefore(LocalDate.now()))
+            if(postUpdateReq.postStatus() != PostStatus.UPCOMING)
+                throw new IllegalArgumentException("모집 시작일 전에는 모집 속성을 변경할 수 없습니다.");
+        if(post.getRecruitmentEndDate().isBefore(LocalDate.now()))
+            if(postUpdateReq.postStatus() != PostStatus.RECRUITED)
+                throw new IllegalArgumentException("모집 마감일 후에는 모집 속성을 변경할 수 없습니다.");
 
         post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.recruitmentStartDate(),
                 postUpdateReq.recruitmentEndDate(), postUpdateReq.activityStartDate(), postUpdateReq.maxPeople(),

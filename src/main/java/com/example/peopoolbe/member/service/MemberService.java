@@ -156,6 +156,13 @@ public class MemberService {
                 .build();
     }
 
+    public boolean isNicknameDuplicated(CheckNicknameDTO checkNicknameDTO) {
+        return memberRepository.existsByNickname(checkNicknameDTO.nickname());
+    }
+    public boolean isEmailDuplicated(CheckEmailDTO checkEmailDTO) {
+        return memberRepository.existsByEmail(checkEmailDTO.email());
+    }
+
     public Member getUserByToken(Principal principal) {
         Long userId = Long.parseLong(principal.getName());
 

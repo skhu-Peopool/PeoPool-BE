@@ -25,6 +25,7 @@ public record PostInfoRes(
         PostStatus postStatus,
         Category category,
         String image,
+        Integer views,
         Long writerId,
         String writerName
 ) {
@@ -44,6 +45,7 @@ public record PostInfoRes(
                 .postStatus(post.getPostStatus())
                 .category(post.getCategory())
                 .image(post.getImage())
+                .views(post.getViews())
                 .writerId(post.getMember().getId())
                 .writerName(post.getMember().getNickname())
                 .build();

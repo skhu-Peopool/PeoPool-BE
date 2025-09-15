@@ -53,6 +53,9 @@ public class Post extends BaseEntity {
     @Column(name = "POST_IMAGE")
     private String image;
 
+    @Column(name = "POST_VIEWS")
+    private Integer views;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -60,7 +63,8 @@ public class Post extends BaseEntity {
     @Builder
     public Post(String title, String content, LocalDate recruitmentStartDate,
                 LocalDate recruitmentEndDate, LocalDate activityStartDate, Integer maximumPeople,
-                Integer approvedPeople, Integer appliedPeople, PostStatus postStatus, Category category, String image, Member member) {
+                Integer approvedPeople, Integer appliedPeople, PostStatus postStatus, Category category,
+                String image, Member member, Integer views) {
         this.title = title;
         this.content = content;
         this.recruitmentStartDate = recruitmentStartDate;
@@ -73,6 +77,7 @@ public class Post extends BaseEntity {
         this.member = member;
         this.category = category;
         this.image = image;
+        this.views = views;
     }
 
     public void update(String title, String content, LocalDate recruitmentStartDate,
@@ -95,4 +100,5 @@ public class Post extends BaseEntity {
 
     public void updateApprovedPeople(Integer approvedPeople) { this.approvedPeople = approvedPeople; }
     public void updateAppliedPeople(Integer appliedPeople) { this.appliedPeople = appliedPeople; }
+    public void incrementViews() { this.views++; }
 }

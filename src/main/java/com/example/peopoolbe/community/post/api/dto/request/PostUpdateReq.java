@@ -3,6 +3,8 @@ package com.example.peopoolbe.community.post.api.dto.request;
 import com.example.peopoolbe.community.post.domain.Category;
 import com.example.peopoolbe.community.post.domain.PostStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
 import java.time.LocalDate;
 

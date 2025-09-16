@@ -40,14 +40,16 @@ public class PostController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "게시물 등록 성공"),
-            @ApiResponse(responseCode = "403", description = "엑세스토큰 없음")
+            @ApiResponse(responseCode = "400", description = "게시물 등록 에러"),
+            @ApiResponse(responseCode = "403", description = "엑세스토큰 없음"),
+            @ApiResponse(responseCode = "500", description = "뭔가 하나 값이 빠짐")
     })
     @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PostInfoRes> addPost(Principal principal,
                                                @Parameter(hidden = true) @RequestPart("postAddReq") String postAddReqJson,
                                                @Parameter(hidden = true) @RequestPart(value = "image", required = false) MultipartFile image) throws Exception {
         PostAddReq postAddReq = objectMapper.readValue(postAddReqJson, PostAddReq.class);
-        return ResponseEntity.status(HttpStatus.CREATED).body(postService.addPost(postAddReq, image, principal));
+        return postService.addPost(postAddReq, image, principal);
     }
 
     @Operation(summary = "게시물 조회", description = "게시물 ID값으로 게시물을 조회")
@@ -95,7 +97,8 @@ public class PostController {
             )
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "수정 성공"),
+            @ApiResponse(responseCode = "200", description = "게시물 수정 성공"),
+            @ApiResponse(responseCode = "400", description = "게시물 수정 에러"),
             @ApiResponse(responseCode = "403", description = "엑세스토큰 없음"),
             @ApiResponse(responseCode = "500", description = "수정 권한 없음")
     })
@@ -104,7 +107,7 @@ public class PostController {
                                                   @Parameter(hidden = true) @RequestPart("postUpdateReq") String postUpdateReqJson,
                                                   @Parameter(hidden = true) @RequestPart(value = "image", required = false) MultipartFile image) throws Exception {
         PostUpdateReq postUpdateReq = objectMapper.readValue(postUpdateReqJson, PostUpdateReq.class);
-        return ResponseEntity.ok(postService.updatePost(postId, postUpdateReq, image, principal));
+        return postService.updatePost(postId, postUpdateReq, image, principal);
     }
 
     @Operation(summary = "게시물 삭제", description = "본인이 작성한 게시물 삭제")

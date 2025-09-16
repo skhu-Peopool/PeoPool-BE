@@ -17,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,15 +35,17 @@ public class PostService {
     private final MemberService memberService;
     private final S3Service s3Service;
 
-    public PostInfoRes addPost(PostAddReq postAddReq, MultipartFile image, Principal principal) {
+    public ResponseEntity addPost(PostAddReq postAddReq, MultipartFile image, Principal principal) {
         Member member = memberService.getUserByToken(principal);
 
-        checkDateStartEndOrder(postAddReq.recruitmentStartDate(), postAddReq.recruitmentEndDate());
-
+        if(postAddReq.recruitmentStartDate().isAfter(postAddReq.recruitmentEndDate()))
+            return ResponseEntity.status(400).body("날짜의 순서가 올바르지 않음");
         if(postAddReq.recruitmentStartDate().isBefore(LocalDate.now()))
-            throw new IllegalArgumentException("모집 시작 날짜가 현재 날짜보다 앞섭니다.");
+            return ResponseEntity.status(400).body("모집 시작 날짜가 현재 날짜보다 앞섭니다.");
         if(postAddReq.activityStartDate().isBefore(LocalDate.now()))
-            throw new IllegalArgumentException("활동 시작 날짜가 현재 날짜보다 앞섭니다.");
+            return ResponseEntity.status(400).body("활동 시작 날짜가 현재 날짜보다 앞섭니다.");
+        if(!postAddReq.activityStartDate().isAfter(postAddReq.recruitmentEndDate()))
+            return ResponseEntity.status(400).body("활동 시작 날짜가 모집 마감 날짜보다 앞섭니다.");
 
         Post post = Post.builder()
                 .title(postAddReq.title())
@@ -61,7 +65,7 @@ public class PostService {
 
         postRepository.save(post);
 
-        return PostInfoRes.from(post);
+        return ResponseEntity.status(HttpStatus.CREATED).body(PostInfoRes.from(post));
     }
 
     public PostInfoRes getPostInfo(Long postId) {
@@ -114,35 +118,41 @@ public class PostService {
 //        return PostListRes.fromPostList(postInfoResList);
 //    }
 
-    public PostInfoRes updatePost(Long postId, PostUpdateReq postUpdateReq, MultipartFile image, Principal principal) {
+    public ResponseEntity updatePost(Long postId, PostUpdateReq postUpdateReq, MultipartFile image, Principal principal) {
         Member member = memberService.getUserByToken(principal);
         Post post = getPostByPostId(postId);
 
         checkWriter(member, post);
-        checkDateStartEndOrder(postUpdateReq.recruitmentStartDate(), postUpdateReq.recruitmentEndDate());
-
+        if(postUpdateReq.recruitmentStartDate().isAfter(postUpdateReq.recruitmentEndDate()))
+            return ResponseEntity.status(400).body("날짜의 순서가 올바르지 않음");
         if(!post.getRecruitmentStartDate().isEqual(postUpdateReq.recruitmentStartDate()))
             if(postUpdateReq.recruitmentStartDate().isBefore(LocalDate.now())) {
                 if(postUpdateReq.recruitmentStartDate().isEqual(LocalDate.now()) && postUpdateReq.postStatus() == PostStatus.UPCOMING)
-                    throw new IllegalArgumentException("모집 중에는 모집 예정으로 변경할 수 없습니다.");
-                throw new IllegalArgumentException("수정된 모집 시작 날짜가 현재 날짜보다 앞섭니다.");
+                    return ResponseEntity.status(400).body("모집 중에는 모집 예정으로 변경할 수 없습니다.");
+                return ResponseEntity.status(400).body("수정된 모집 시작 날짜가 현재 날짜보다 앞섭니다.");
             }
         if(!post.getActivityStartDate().isEqual(postUpdateReq.activityStartDate()))
             if(postUpdateReq.activityStartDate().isBefore(LocalDate.now()))
-                throw new IllegalArgumentException("수정된 활동 시작 날짜가 현재 날짜보다 앞섭니다.");
-        if(post.getRecruitmentStartDate().isBefore(LocalDate.now()))
+                return ResponseEntity.status(400).body("수정된 활동 시작 날짜가 현재 날짜보다 앞섭니다.");
+        if(!postUpdateReq.recruitmentStartDate().isBefore(LocalDate.now()))
             if(postUpdateReq.postStatus() != PostStatus.UPCOMING)
-                throw new IllegalArgumentException("모집 시작일 전에는 모집 속성을 변경할 수 없습니다.");
-        if(post.getRecruitmentEndDate().isBefore(LocalDate.now()))
+                return ResponseEntity.status(400).body("모집 시작일 전에는 모집 속성을 변경할 수 없습니다.");
+        if(postUpdateReq.recruitmentEndDate().isAfter(LocalDate.now()))
             if(postUpdateReq.postStatus() != PostStatus.RECRUITED)
-                throw new IllegalArgumentException("모집 마감일 후에는 모집 속성을 변경할 수 없습니다.");
+                return ResponseEntity.status(400).body("모집 마감일 후에는 모집 속성을 변경할 수 없습니다.");
+        if(!LocalDate.now().isBefore(postUpdateReq.recruitmentStartDate()) && !LocalDate.now().isAfter(postUpdateReq.recruitmentEndDate()))
+            if(postUpdateReq.postStatus() != PostStatus.RECRUITING && postUpdateReq.postStatus() != PostStatus.UNDER_REVIEW)
+                return ResponseEntity.status(400).body("모집 중에는 모집 속성을 모집 중 또는 검토 중으로만 변경 가능합니다.");
+        if(!postUpdateReq.activityStartDate().isAfter(postUpdateReq.recruitmentEndDate()))
+            return ResponseEntity.status(400).body("활동 시작 날짜가 모집 날짜보다 앞섭니다.");
+
 
         post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.recruitmentStartDate(),
                 postUpdateReq.recruitmentEndDate(), postUpdateReq.activityStartDate(), postUpdateReq.maxPeople(),
                 postUpdateReq.postStatus(), postUpdateReq.category(), s3Service.uploadExistingPostImage(image, postId));
         postRepository.save(post);
 
-        return PostInfoRes.from(post);
+        return ResponseEntity.ok(PostInfoRes.from(post));
     }
 
     public void deletePost(Long postId, Principal principal) {
@@ -159,14 +169,8 @@ public class PostService {
     }
 
     public void checkWriter(Member member, Post post) {
-        if(!post.getMember().getId().equals(member.getId())) {
+        if (!post.getMember().getId().equals(member.getId())) {
             throw new IllegalArgumentException("접근 권한 없음");
-        }
-    }
-
-    private void checkDateStartEndOrder(LocalDate startDate, LocalDate endDate) {
-        if(startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("날짜의 순서가 올바르지 않음");
         }
     }
 }

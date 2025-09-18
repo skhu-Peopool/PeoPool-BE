@@ -27,7 +27,8 @@ public class MailService {
         Random random = new Random();
         StringBuilder key = new StringBuilder();
 
-        for (int i = 0; i < 6; i++) {
+        key.append(random.nextInt(9)+1);
+        for (int i = 0; i < 5; i++) {
             key.append(random.nextInt(10));
         }
 

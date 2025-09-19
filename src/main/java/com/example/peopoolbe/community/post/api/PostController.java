@@ -89,6 +89,17 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostList(query, page, size, start, end, category, postStatus));
     }
 
+    @Operation(summary = "작성한 게시물 조회", description = "본인이 작성한 게시물 리스트 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "403", description = "토큰 없음"),
+            @ApiResponse(responseCode = "500", description = "서버에 문의하세요")
+    })
+    @GetMapping("/mypost")
+    public ResponseEntity<PostListRes> getMyPost(Principal principal) {
+        return ResponseEntity.ok(postService.getMyPost(principal));
+    }
+
     @Operation(summary = "게시물 수정", description = "본인이 작성한 게시물 수정")
     @RequestBody(
             content = @Content(

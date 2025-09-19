@@ -118,6 +118,20 @@ public class PostService {
 //        return PostListRes.fromPostList(postInfoResList);
 //    }
 
+    public PostListRes getMyPost(Principal principal) {
+        Member member = memberService.getUserByToken(principal);
+
+        List<Post> postList = postRepository.findAllByMemberId(member.getId());
+        List<PostInfoRes> postInfoResList = postList.stream()
+                .map(PostInfoRes::from)
+                .toList();
+
+        return PostListRes.builder()
+                .totalCount(postInfoResList.size())
+                .postList(postInfoResList)
+                .build();
+    }
+
     public ResponseEntity updatePost(Long postId, PostUpdateReq postUpdateReq, MultipartFile image, Principal principal) {
         Member member = memberService.getUserByToken(principal);
         Post post = getPostByPostId(postId);

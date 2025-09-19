@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
@@ -45,4 +46,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 //    Page<Post> searchPost(Pageable pageable, @Param("start") LocalDate start,
 //                          @Param("end") LocalDate end, @Param("category") Category category,
 //                          @Param("status") Status status);
+
+    List<Post> findAllByMemberId(Long memberId);
 }

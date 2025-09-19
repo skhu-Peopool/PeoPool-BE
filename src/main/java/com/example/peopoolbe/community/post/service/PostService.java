@@ -125,19 +125,22 @@ public class PostService {
         checkWriter(member, post);
         if(postUpdateReq.recruitmentStartDate().isAfter(postUpdateReq.recruitmentEndDate()))
             return ResponseEntity.status(400).body("날짜의 순서가 올바르지 않음");
-        if(!post.getRecruitmentStartDate().isEqual(postUpdateReq.recruitmentStartDate()))
-            if(postUpdateReq.recruitmentStartDate().isBefore(LocalDate.now())) {
-                if(postUpdateReq.recruitmentStartDate().isEqual(LocalDate.now()) && postUpdateReq.postStatus() == PostStatus.UPCOMING)
-                    return ResponseEntity.status(400).body("모집 중에는 모집 예정으로 변경할 수 없습니다.");
+        if (!post.getRecruitmentStartDate().isEqual(postUpdateReq.recruitmentStartDate())) {
+            if (postUpdateReq.recruitmentStartDate().isBefore(LocalDate.now())) {
                 return ResponseEntity.status(400).body("수정된 모집 시작 날짜가 현재 날짜보다 앞섭니다.");
             }
+            if (postUpdateReq.recruitmentStartDate().isEqual(LocalDate.now())
+                    && postUpdateReq.postStatus() == PostStatus.UPCOMING) {
+                return ResponseEntity.status(400).body("모집 중에는 모집 예정으로 변경할 수 없습니다.");
+            }
+        }
         if(!post.getActivityStartDate().isEqual(postUpdateReq.activityStartDate()))
             if(postUpdateReq.activityStartDate().isBefore(LocalDate.now()))
                 return ResponseEntity.status(400).body("수정된 활동 시작 날짜가 현재 날짜보다 앞섭니다.");
-        if(!postUpdateReq.recruitmentStartDate().isBefore(LocalDate.now()))
+        if(postUpdateReq.recruitmentStartDate().isAfter(LocalDate.now()))
             if(postUpdateReq.postStatus() != PostStatus.UPCOMING)
                 return ResponseEntity.status(400).body("모집 시작일 전에는 모집 속성을 변경할 수 없습니다.");
-        if(postUpdateReq.recruitmentEndDate().isAfter(LocalDate.now()))
+        if(LocalDate.now().isAfter(postUpdateReq.recruitmentEndDate()))
             if(postUpdateReq.postStatus() != PostStatus.RECRUITED)
                 return ResponseEntity.status(400).body("모집 마감일 후에는 모집 속성을 변경할 수 없습니다.");
         if(!LocalDate.now().isBefore(postUpdateReq.recruitmentStartDate()) && !LocalDate.now().isAfter(postUpdateReq.recruitmentEndDate()))

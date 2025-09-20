@@ -26,7 +26,7 @@ public record UserInfo(
                 .id(member.getId())
                 .createdAt(member.getCreatedAt())
                 .nickname(member.getNickname())
-                .profileImage(member.getProfileImage())
+                .profileImage(member.getProfileImage().getPath())
                 .email(member.getEmail())
                 .mainIntroduction(member.getMainIntroduction())
                 .subIntroduction(member.getSubIntroduction())

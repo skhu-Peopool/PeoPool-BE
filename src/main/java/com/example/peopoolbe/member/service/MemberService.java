@@ -39,12 +39,11 @@ public class MemberService {
     private String bucket;
 
     public TokenResDto signUp(MemberSignUpReq memberSignUpReq, HttpServletResponse response) {
-        String defaultImage = "https://" + bucket + ".s3." + region + ".amazonaws.com/default.png";
         Member member = Member.builder()
                 .nickname(memberSignUpReq.nickname())
                 .email(memberSignUpReq.email())
                 .password(passwordEncoder.encode(memberSignUpReq.password()))
-                .profileImage(defaultImage)
+                .profileImage(null)
                 .profileVisible(ViewStatus.INVISIBLE)
                 .activityVisible(ViewStatus.INVISIBLE)
                 .postVisible(ViewStatus.INVISIBLE)
@@ -100,7 +99,7 @@ public class MemberService {
                 memberProfileUpdateReq.subIntroduction(),
                 memberProfileUpdateReq.hashtag(),
                 memberProfileUpdateReq.kakaoId(),
-                s3Service.uploadProfileImage(image, member));
+                (s3Service.uploadProfileImage(image, member)));
 
         memberRepository.save(member);
 
@@ -150,7 +149,7 @@ public class MemberService {
         return UserInfo.builder()
                 .id(member.getId())
                 .nickname(member.getNickname())
-                .profileImage(member.getProfileImage())
+                .profileImage(member.getProfileImage().getPath())
                 .email(member.getEmail())
                 .profileVisible(member.getProfileVisible())
                 .build();

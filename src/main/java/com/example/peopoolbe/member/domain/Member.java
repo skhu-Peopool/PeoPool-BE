@@ -2,6 +2,7 @@ package com.example.peopoolbe.member.domain;
 
 import com.example.peopoolbe.community.post.domain.Post;
 import com.example.peopoolbe.global.entity.BaseEntity;
+import com.example.peopoolbe.global.s3.domain.Image;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,8 +25,9 @@ public class Member extends BaseEntity {
     @Column(name = "USER_EMAIL", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "USER_PROFILE_IMG")
-    private String profileImage;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "USER_PROFILE_IMAGE_ID")
+    private Image profileImage;
 
     @Column(name = "USER_MAIN_INTRODUCTION")
     private String mainIntroduction;
@@ -64,7 +66,7 @@ public class Member extends BaseEntity {
 
     @Builder
     public Member(String password, String nickname, String email,
-                  String profileImage, String mainIntroduction, String subIntroduction,
+                  Image profileImage, String mainIntroduction, String subIntroduction,
                   String hashtag, String kakaoId, List<Post> posts, ViewStatus profileVisible,
                   ViewStatus activityVisible, ViewStatus postVisible) {
         this.password = password;
@@ -84,13 +86,13 @@ public class Member extends BaseEntity {
 
     public void updateProfile(
             String nickname, String mainIntroduction, String subIntroduction,
-            String hashtag, String kakaoId, String image) {
+            String hashtag, String kakaoId, Image profileImage) {
         this.nickname = nickname;
         this.mainIntroduction = mainIntroduction;
         this.subIntroduction = subIntroduction;
         this.hashtag = hashtag;
         this.kakaoId = kakaoId;
-        this.profileImage = image;
+        this.profileImage = profileImage;
     }
 
     public void updateProfileVisibility(ViewStatus profileVisible) {

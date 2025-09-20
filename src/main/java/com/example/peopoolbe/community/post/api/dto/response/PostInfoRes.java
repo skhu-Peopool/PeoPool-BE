@@ -29,7 +29,8 @@ public record PostInfoRes(
         String[] image,
         Integer views,
         Long writerId,
-        String writerName
+        String writerName,
+        String writerProfileImage
 ) {
     public static PostInfoRes from(Post post) {
         return PostInfoRes.builder()
@@ -50,6 +51,7 @@ public record PostInfoRes(
                 .views(post.getViews())
                 .writerId(post.getMember().getId())
                 .writerName(post.getMember().getNickname())
+                .writerProfileImage(post.getMember().getProfileImage().getPath())
                 .build();
     }
 }

@@ -13,7 +13,10 @@ public record EnrollmentApplyingRes(
         Long postId,
         String comment,
         EnrollmentStatus status,
-        LocalDateTime appliedAt
+        LocalDateTime appliedAt,
+        String memberNickname,
+        String memberEmail,
+        String memberProfileImage
 ) {
     public static EnrollmentApplyingRes from(Enrollment enrollment) {
         return EnrollmentApplyingRes.builder()
@@ -23,6 +26,9 @@ public record EnrollmentApplyingRes(
                 .comment(enrollment.getComment())
                 .status(enrollment.getStatus())
                 .appliedAt(enrollment.getCreatedAt())
+                .memberNickname(enrollment.getMember().getNickname())
+                .memberEmail(enrollment.getMember().getEmail())
+                .memberProfileImage(enrollment.getMember().getProfileImage().getPath())
                 .build();
     }
 }

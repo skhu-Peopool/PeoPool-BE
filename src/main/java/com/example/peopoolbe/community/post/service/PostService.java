@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -35,9 +36,12 @@ public class PostService {
     private final MemberService memberService;
     private final S3Service s3Service;
 
-    public ResponseEntity addPost(PostAddReq postAddReq, MultipartFile image, Principal principal) {
+    public ResponseEntity addPost(PostAddReq postAddReq, MultipartFile[] image, Principal principal) {
         Member member = memberService.getUserByToken(principal);
 
+        if(image.length > 5) {
+            return ResponseEntity.status(400).body("사진은 최대 5장까지 업로드 가능");
+        }
         if(postAddReq.recruitmentStartDate().isAfter(postAddReq.recruitmentEndDate()))
             return ResponseEntity.status(400).body("날짜의 순서가 올바르지 않음");
         if(postAddReq.recruitmentStartDate().isBefore(LocalDate.now()))
@@ -58,11 +62,16 @@ public class PostService {
                 .appliedPeople(0)
                 .postStatus(postAddReq.recruitmentStartDate().isEqual(LocalDate.now()) ? PostStatus.RECRUITING : PostStatus.UPCOMING)
                 .category(postAddReq.category())
-                .image(s3Service.uploadNewPostImage(image))
                 .views(0)
                 .member(member)
                 .build();
 
+        postRepository.save(post);
+
+        for(MultipartFile file : image) {
+            post.updateImage(s3Service.uploadPostImage(file, post));
+        }
+//        post.updateImages(Arrays.stream(s3Service.uploadPostImage(image, post)).toList());
         postRepository.save(post);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(PostInfoRes.from(post));
@@ -121,18 +130,15 @@ public class PostService {
     public PostListRes getMyPost(Principal principal) {
         Member member = memberService.getUserByToken(principal);
 
-        List<Post> postList = postRepository.findAllByMemberId(member.getId());
-        List<PostInfoRes> postInfoResList = postList.stream()
-                .map(PostInfoRes::from)
-                .toList();
+        List<Post> posts = member.getPosts();
 
         return PostListRes.builder()
-                .totalCount(postInfoResList.size())
-                .postList(postInfoResList)
+                .totalCount(posts.size())
+                .postList(posts.stream().map(PostInfoRes::from).toList())
                 .build();
     }
 
-    public ResponseEntity updatePost(Long postId, PostUpdateReq postUpdateReq, MultipartFile image, Principal principal) {
+    public ResponseEntity updatePost(Long postId, PostUpdateReq postUpdateReq, MultipartFile[] image, Principal principal) {
         Member member = memberService.getUserByToken(principal);
         Post post = getPostByPostId(postId);
 
@@ -166,7 +172,10 @@ public class PostService {
 
         post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.recruitmentStartDate(),
                 postUpdateReq.recruitmentEndDate(), postUpdateReq.activityStartDate(), postUpdateReq.maxPeople(),
-                postUpdateReq.postStatus(), postUpdateReq.category(), s3Service.uploadExistingPostImage(image, postId));
+                postUpdateReq.postStatus(), postUpdateReq.category());
+        for(MultipartFile file : image) {
+            post.updateImage(s3Service.uploadPostImage(file, post));
+        }
         postRepository.save(post);
 
         return ResponseEntity.ok(PostInfoRes.from(post));

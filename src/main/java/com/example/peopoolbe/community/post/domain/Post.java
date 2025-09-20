@@ -1,6 +1,7 @@
 package com.example.peopoolbe.community.post.domain;
 
 import com.example.peopoolbe.global.entity.BaseEntity;
+import com.example.peopoolbe.global.s3.domain.Image;
 import com.example.peopoolbe.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -9,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -50,8 +53,8 @@ public class Post extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    @Column(name = "POST_IMAGE")
-    private String image;
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> image = new ArrayList<>();
 
     @Column(name = "POST_VIEWS")
     private Integer views;
@@ -64,7 +67,7 @@ public class Post extends BaseEntity {
     public Post(String title, String content, LocalDate recruitmentStartDate,
                 LocalDate recruitmentEndDate, LocalDate activityStartDate, Integer maximumPeople,
                 Integer approvedPeople, Integer appliedPeople, PostStatus postStatus, Category category,
-                String image, Member member, Integer views) {
+                Member member, Integer views) {
         this.title = title;
         this.content = content;
         this.recruitmentStartDate = recruitmentStartDate;
@@ -76,13 +79,12 @@ public class Post extends BaseEntity {
         this.postStatus = postStatus;
         this.member = member;
         this.category = category;
-        this.image = image;
         this.views = views;
     }
 
     public void update(String title, String content, LocalDate recruitmentStartDate,
                        LocalDate recruitmentEndDate, LocalDate activityStartDate, Integer maximumPeople,
-                       PostStatus postStatus, Category category, String image) {
+                       PostStatus postStatus, Category category) {
         this.title = title;
         this.content = content;
         this.recruitmentStartDate = recruitmentStartDate;
@@ -91,11 +93,14 @@ public class Post extends BaseEntity {
         this.maximumPeople = maximumPeople;
         this.postStatus = postStatus;
         this.category = category;
-        this.image = image;
     }
 
     public void updateStatus(PostStatus postStatus){
         this.postStatus = postStatus;
+    }
+
+    public void updateImage(Image image){
+        this.image.add(image);
     }
 
     public void updateApprovedPeople(Integer approvedPeople) { this.approvedPeople = approvedPeople; }

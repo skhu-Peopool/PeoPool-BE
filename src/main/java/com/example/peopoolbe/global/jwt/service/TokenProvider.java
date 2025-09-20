@@ -114,7 +114,7 @@ public class TokenProvider {
         return AccessTokenAndUserInfo.builder()
                 .accessToken(accessTokenBuilder(member))
                 .nickname(member.getNickname())
-                .profileImage(member.getProfileImage())
+                .profileImage(member.getProfileImage().getPath())
                 .email(member.getEmail())
                 .profileVisible(member.getProfileVisible())
                 .activityVisible(member.getActivityVisible())

@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -78,6 +79,48 @@ public class S3Service {
         return image;
     }
 
+    public Image uploadPostImage(MultipartFile multipartFile, Post post) {
+        if(multipartFile == null || multipartFile.isEmpty()) {
+            return null;
+        }
+
+        imageRepository.deleteAllByPost(post);
+
+//        Image[] images = new Image[multipartFiles.length];
+//        for(MultipartFile multipartFile : multipartFiles) {
+//            String prefix = "Post_" + postId + "_";
+//            String fileName = prefix + multipartFile.getOriginalFilename();
+//            awsImageUpload(multipartFile, fileName);
+//
+//            images[multipartFile.get]
+//        }
+//        IntStream.range(0, multipartFile.length)
+//                .forEach(i -> {
+//                    String prefix = "Post_" + post.getId() + "_" + i + "_";
+//                    String fileName = prefix + multipartFiles[i].getOriginalFilename();
+//                    awsImageUpload(multipartFiles[i], fileName);
+//
+//                    Image image = Image.builder()
+//                            .path(amazonS3.getUrl(bucket, fileName).toString())
+//                            .fileName(multipartFiles[i].getOriginalFilename())
+//                            .imageType(ImageType.POST)
+//                            .post(post)
+//                            .build();
+//                    imageRepository.save(image);
+//                });
+//        return image;
+        String prefix = "Post_" + post.getId() + "_";
+        String fileName = prefix + multipartFile.getOriginalFilename();
+        awsImageUpload(multipartFile, fileName);
+
+        return Image.builder()
+                .path(amazonS3.getUrl(bucket, fileName).toString())
+                .fileName(multipartFile.getOriginalFilename())
+                .imageType(ImageType.POST)
+                .post(post)
+                .build();
+    }
+
 
 //    public String uploadProfileImage(MultipartFile multipartFile, Member member) {
 //        if(multipartFile == null || multipartFile.isEmpty()) {
@@ -95,33 +138,33 @@ public class S3Service {
 //        return amazonS3.getUrl(bucket, fileName).toString();
 //    }
 
-    public String uploadNewPostImage(MultipartFile multipartFile) {
-        if(multipartFile == null || multipartFile.isEmpty()) {
-            return null;
-        }
-
-        String fileName = createFileName(multipartFile.getOriginalFilename());
-        awsImageUpload(multipartFile, fileName);
-        return amazonS3.getUrl(bucket, fileName).toString();
-    }
-
-    public String uploadExistingPostImage(MultipartFile multipartFile, Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if(multipartFile == null || multipartFile.isEmpty()) {
+//    public String uploadNewPostImage(MultipartFile multipartFile) {
+//        if(multipartFile == null || multipartFile.isEmpty()) {
 //            return null;
-            return post.getImage();
-        }
-
-        String formerFileName = extractFormerFileNameFromPost(post);
-
-        String fileName = createFileName(multipartFile.getOriginalFilename());
-        awsImageUpload(multipartFile, fileName);
-
-        deleteImage(formerFileName);
-
-        return amazonS3.getUrl(bucket, fileName).toString();
-    }
+//        }
+//
+//        String fileName = createFileName(multipartFile.getOriginalFilename());
+//        awsImageUpload(multipartFile, fileName);
+//        return amazonS3.getUrl(bucket, fileName).toString();
+//    }
+//
+//    public String uploadExistingPostImage(MultipartFile multipartFile, Long postId) {
+//        Post post = postRepository.findById(postId)
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+//        if(multipartFile == null || multipartFile.isEmpty()) {
+////            return null;
+//            return post.getImage();
+//        }
+//
+//        String formerFileName = extractFormerFileNameFromPost(post);
+//
+//        String fileName = createFileName(multipartFile.getOriginalFilename());
+//        awsImageUpload(multipartFile, fileName);
+//
+//        deleteImage(formerFileName);
+//
+//        return amazonS3.getUrl(bucket, fileName).toString();
+//    }
 
     private void awsImageUpload(MultipartFile multipartFile, String fileName) {
         ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -150,34 +193,34 @@ public class S3Service {
 //        return null;
 //    }
 
-    private String extractFormerFileNameFromPost(Post post) {
-        String formerFileUrl = post.getImage();
-        if(formerFileUrl != null) {
-            String regex = "([^/]+\\.jpg)$";
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(formerFileUrl);
-            if(matcher.find()) {
-                return matcher.group(1);
-            }
-        }
-        return null;
-    }
+//    private String extractFormerFileNameFromPost(Post post) {
+//        String formerFileUrl = post.getImage();
+//        if(formerFileUrl != null) {
+//            String regex = "([^/]+\\.jpg)$";
+//            Pattern pattern = Pattern.compile(regex);
+//            Matcher matcher = pattern.matcher(formerFileUrl);
+//            if(matcher.find()) {
+//                return matcher.group(1);
+//            }
+//        }
+//        return null;
+//    }
 
-    private String createFileName(String fileName) {
-        return UUID.randomUUID().toString().concat(getFileExtension(fileName));
-    }
+//    private String createFileName(String fileName) {
+//        return UUID.randomUUID().toString().concat(getFileExtension(fileName));
+//    }
 
-    private String getFileExtension(String fileName) {
-        try {
-            return fileName.substring(fileName.lastIndexOf("."));
-        } catch (StringIndexOutOfBoundsException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일(" + fileName + ").");
-        }
-    }
+//    private String getFileExtension(String fileName) {
+//        try {
+//            return fileName.substring(fileName.lastIndexOf("."));
+//        } catch (StringIndexOutOfBoundsException e) {
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일(" + fileName + ").");
+//        }
+//    }
 
-    private void deleteImage(String fileName) {
-        if(fileName == null || fileName.isEmpty() || fileName.equals("default.png"))
-            return;
-        amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
-    }
+//    private void deleteImage(String fileName) {
+//        if(fileName == null || fileName.isEmpty() || fileName.equals("default.png"))
+//            return;
+//        amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
+//    }
 }

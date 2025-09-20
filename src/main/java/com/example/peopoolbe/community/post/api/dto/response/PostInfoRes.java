@@ -3,11 +3,13 @@ package com.example.peopoolbe.community.post.api.dto.response;
 import com.example.peopoolbe.community.post.domain.Category;
 import com.example.peopoolbe.community.post.domain.Post;
 import com.example.peopoolbe.community.post.domain.PostStatus;
+import com.example.peopoolbe.global.s3.domain.Image;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Builder
 public record PostInfoRes(
@@ -24,7 +26,7 @@ public record PostInfoRes(
         Integer appliedPeople,
         PostStatus postStatus,
         Category category,
-        String image,
+        String[] image,
         Integer views,
         Long writerId,
         String writerName
@@ -44,7 +46,7 @@ public record PostInfoRes(
                 .appliedPeople(post.getAppliedPeople())
                 .postStatus(post.getPostStatus())
                 .category(post.getCategory())
-                .image(post.getImage())
+                .image(post.getImage() == null ? null : post.getImage().stream().filter(Objects::nonNull).map(Image::getPath).toArray(String[]::new))
                 .views(post.getViews())
                 .writerId(post.getMember().getId())
                 .writerName(post.getMember().getNickname())

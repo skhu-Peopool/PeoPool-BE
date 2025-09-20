@@ -121,14 +121,11 @@ public class PostService {
     public PostListRes getMyPost(Principal principal) {
         Member member = memberService.getUserByToken(principal);
 
-        List<Post> postList = postRepository.findAllByMemberId(member.getId());
-        List<PostInfoRes> postInfoResList = postList.stream()
-                .map(PostInfoRes::from)
-                .toList();
+        List<Post> posts = member.getPosts();
 
         return PostListRes.builder()
-                .totalCount(postInfoResList.size())
-                .postList(postInfoResList)
+                .totalCount(posts.size())
+                .postList(posts.stream().map(PostInfoRes::from).toList())
                 .build();
     }
 

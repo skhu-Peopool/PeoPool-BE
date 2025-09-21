@@ -28,7 +28,7 @@ public record EnrollmentApplyingRes(
                 .appliedAt(enrollment.getCreatedAt())
                 .memberNickname(enrollment.getMember().getNickname())
                 .memberEmail(enrollment.getMember().getEmail())
-                .memberProfileImage(enrollment.getMember().getProfileImage().getPath())
+                .memberProfileImage(enrollment.getMember().getProfileImage().getPath() == null ? null : enrollment.getMember().getProfileImage().getPath())
                 .build();
     }
 }

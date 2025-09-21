@@ -51,7 +51,7 @@ public record PostInfoRes(
                 .views(post.getViews())
                 .writerId(post.getMember().getId())
                 .writerName(post.getMember().getNickname())
-                .writerProfileImage(post.getMember().getProfileImage().getPath())
+                .writerProfileImage(post.getMember().getProfileImage() == null ? null : post.getMember().getProfileImage().getPath())
                 .build();
     }
 }

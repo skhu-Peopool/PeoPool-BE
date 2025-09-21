@@ -149,7 +149,7 @@ public class MemberService {
         return UserInfo.builder()
                 .id(member.getId())
                 .nickname(member.getNickname())
-                .profileImage(member.getProfileImage().getPath() == null ? null : member.getProfileImage().getPath())
+                .profileImage(member.getProfileImage() == null ? null : member.getProfileImage().getPath())
                 .email(member.getEmail())
                 .profileVisible(member.getProfileVisible())
                 .build();

@@ -18,6 +18,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.security.Key;
@@ -50,6 +51,7 @@ public class TokenProvider {
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
+    @Transactional
     public TokenResDto createToken(Member member) {
         return TokenResDto.builder()
                 .accessToken(accessTokenBuilder(member))
@@ -78,6 +80,7 @@ public class TokenProvider {
                 .compact();
     }
 
+    @Transactional
     private String refreshTokenBuilder(Member member) {
         long nowTime = (new Date().getTime());
         Date refreshTokenExpiredTime = new Date(nowTime + refreshTokenValidityTime);
@@ -96,6 +99,7 @@ public class TokenProvider {
         return refreshToken;
     }
 
+    @Transactional(readOnly = true)
     public AccTokenResDto accessTokenReIssue(String refreshToken) {
         Long userId = Long.parseLong(parseClaims(refreshToken).getSubject());
         Member member = memberRepository.findById(userId)
@@ -106,6 +110,7 @@ public class TokenProvider {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public AccessTokenAndUserInfo getAccessTokenAndUserInfo(String refreshToken) {
         Long userId = Long.parseLong(parseClaims(refreshToken).getSubject());
         Member member = memberRepository.findById(userId)

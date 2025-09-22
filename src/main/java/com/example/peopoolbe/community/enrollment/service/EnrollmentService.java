@@ -29,6 +29,7 @@ public class EnrollmentService {
     private final EnrollmentRepository enrollmentRepository;
     private final PostService postService;
 
+    @Transactional
     public EnrollmentApplyingRes applyEnrollment(Principal principal, Long postId, EnrollmentApplyingReq enrollmentApplyingReq) {
         Member member = memberService.getUserByToken(principal);
         Post post = postRepository.findById(postId)
@@ -88,6 +89,7 @@ public class EnrollmentService {
         return EnrollmentApplyingList.fromApplyingRes(enrollmentApplyingList);
     }
 
+    @Transactional
     public void cancelEnrollment(Principal principal, Long postId) {
         Member member = memberService.getUserByToken(principal);
         Post post = postRepository.findById(postId)
@@ -101,6 +103,7 @@ public class EnrollmentService {
         postRepository.save(post);
     }
 
+    @Transactional
     public EnrollmentApplyingRes approveEnrollment(Principal principal, Long EnrollmentId) {
         Member member = memberService.getUserByToken(principal);
         Enrollment enrollment = enrollmentRepository.findById(EnrollmentId)
@@ -110,7 +113,6 @@ public class EnrollmentService {
 
         postService.checkWriter(member, post);
         enrollment.update(EnrollmentStatus.APPROVED, LocalDateTime.now());
-        enrollmentRepository.save(enrollment);
 
         post.updateApprovedPeople(enrollmentRepository.countByPostIdAndStatusIs(post.getId(), EnrollmentStatus.APPROVED));
         postRepository.save(post);
@@ -118,6 +120,7 @@ public class EnrollmentService {
         return EnrollmentApplyingRes.from(enrollment);
     }
 
+    @Transactional
     public EnrollmentApplyingRes rejectEnrollment(Principal principal, Long EnrollmentId) {
         Member member = memberService.getUserByToken(principal);
         Enrollment enrollment = enrollmentRepository.findById(EnrollmentId)
@@ -127,7 +130,6 @@ public class EnrollmentService {
 
         postService.checkWriter(member, post);
         enrollment.update(EnrollmentStatus.REJECTED, LocalDateTime.now());
-        enrollmentRepository.save(enrollment);
 
         return EnrollmentApplyingRes.from(enrollment);
     }

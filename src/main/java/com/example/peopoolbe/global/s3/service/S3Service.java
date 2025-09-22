@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -59,6 +60,7 @@ public class S3Service {
 //                .build();
 //    }
 
+    @Transactional
     public Image uploadProfileImage(MultipartFile multipartFile, Member member) {
         if(multipartFile == null || multipartFile.isEmpty()) {
             return null;
@@ -79,6 +81,7 @@ public class S3Service {
         return image;
     }
 
+    @Transactional
     public Image uploadPostImage(MultipartFile multipartFile, Post post) {
         if(multipartFile == null || multipartFile.isEmpty()) {
             return null;

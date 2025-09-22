@@ -20,6 +20,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
@@ -36,6 +37,7 @@ public class PostService {
     private final MemberService memberService;
     private final S3Service s3Service;
 
+    @Transactional
     public ResponseEntity addPost(PostAddReq postAddReq, MultipartFile[] image, Principal principal) {
         Member member = memberService.getUserByToken(principal);
 
@@ -77,6 +79,7 @@ public class PostService {
         return ResponseEntity.status(HttpStatus.CREATED).body(PostInfoRes.from(post));
     }
 
+    @Transactional
     public PostInfoRes getPostInfo(Long postId) {
         Post post = getPostByPostId(postId);
         post.incrementViews();
@@ -85,6 +88,7 @@ public class PostService {
         return PostInfoRes.from(post);
     }
 
+    @Transactional
     public PostListRes getPostList(String word, int page, int size, String startDate, String endDate, Category category, PostStatus postStatus) {
         Pageable pageable = PageRequest.of(page-1, size, Sort.by("id").descending());
         Page<Post> postPage;
@@ -127,6 +131,7 @@ public class PostService {
 //        return PostListRes.fromPostList(postInfoResList);
 //    }
 
+    @Transactional
     public PostListRes getMyPost(Principal principal) {
         Member member = memberService.getUserByToken(principal);
 
@@ -138,6 +143,7 @@ public class PostService {
                 .build();
     }
 
+    @Transactional
     public ResponseEntity updatePost(Long postId, PostUpdateReq postUpdateReq, MultipartFile[] image, Principal principal) {
         Member member = memberService.getUserByToken(principal);
         Post post = getPostByPostId(postId);
@@ -181,6 +187,7 @@ public class PostService {
         return ResponseEntity.ok(PostInfoRes.from(post));
     }
 
+    @Transactional
     public void deletePost(Long postId, Principal principal) {
         Member member = memberService.getUserByToken(principal);
         Post post = getPostByPostId(postId);

@@ -38,6 +38,7 @@ public class MemberService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
+    @Transactional
     public TokenResDto signUp(MemberSignUpReq memberSignUpReq, HttpServletResponse response) {
         Member member = Member.builder()
                 .nickname(memberSignUpReq.nickname())
@@ -58,6 +59,7 @@ public class MemberService {
         return tokenResDto;
     }
 
+    @Transactional
     public TokenResDto login(MemberLoginReq memberLoginReq, HttpServletResponse response) {
         Member member = memberRepository.findByEmail(memberLoginReq.email())
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 멤버"));
@@ -85,12 +87,14 @@ public class MemberService {
         response.addCookie(refreshCookie);
     }
 
+    @Transactional(readOnly = true)
     public UserInfo getUserInfo(Principal principal) {
         Member member = getUserByToken(principal);
 
         return UserInfo.from(member);
     }
 
+    @Transactional
     public UserInfo updateUserInfo(Principal principal, MemberProfileUpdateReq memberProfileUpdateReq, MultipartFile image) {
         Member member = getUserByToken(principal);
 
@@ -106,6 +110,7 @@ public class MemberService {
         return UserInfo.from(member);
     }
 
+    @Transactional
     public ViewStatus updateProfileVisibility(Principal principal, MemberVisibilityUpdateReq memberVisibilityUpdateReq) {
         Member member = getUserByToken(principal);
         member.updateProfileVisibility(memberVisibilityUpdateReq.visible());
@@ -114,6 +119,7 @@ public class MemberService {
         return member.getProfileVisible();
     }
 
+    @Transactional
     public ViewStatus updateActivityVisibility(Principal principal, MemberVisibilityUpdateReq memberVisibilityUpdateReq) {
         Member member = getUserByToken(principal);
         member.updateActivityVisibility(memberVisibilityUpdateReq.visible());
@@ -122,6 +128,7 @@ public class MemberService {
         return member.getActivityVisible();
     }
 
+    @Transactional
     public ViewStatus updatePostVisibility(Principal principal, MemberVisibilityUpdateReq memberVisibilityUpdateReq) {
         Member member = getUserByToken(principal);
         member.updatePostVisibility(memberVisibilityUpdateReq.visible());
@@ -130,6 +137,7 @@ public class MemberService {
         return member.getPostVisible();
     }
 
+    @Transactional
     public void changePwd(MemberPwdForgotReq memberPwdForgotReq) {
         Member member = memberRepository.findByEmail(memberPwdForgotReq.email())
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 멤버"));
@@ -138,6 +146,7 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    @Transactional
     public UserInfo updatePwd(Principal principal, MemberPwdUpdateReq memberPwdUpdateReq) {
         Member member = getUserByToken(principal);
         if(!passwordEncoder.matches(memberPwdUpdateReq.password(), member.getPassword()))
@@ -155,13 +164,16 @@ public class MemberService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public boolean isNicknameDuplicated(CheckNicknameDTO checkNicknameDTO) {
         return memberRepository.existsByNickname(checkNicknameDTO.nickname());
     }
+    @Transactional(readOnly = true)
     public boolean isEmailDuplicated(CheckEmailDTO checkEmailDTO) {
         return memberRepository.existsByEmail(checkEmailDTO.email());
     }
 
+    @Transactional(readOnly = true)
     public Member getUserByToken(Principal principal) {
         Long userId = Long.parseLong(principal.getName());
 

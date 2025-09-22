@@ -99,8 +99,10 @@ public class Post extends BaseEntity {
         this.postStatus = postStatus;
     }
 
-    public void updateImage(Image image){
-        this.image.add(image);
+    public void updateImages(List<Image> images){
+        this.image.clear();
+        if(images != null)
+            this.image.addAll(images);
     }
 
     public void updateApprovedPeople(Integer approvedPeople) { this.approvedPeople = approvedPeople; }

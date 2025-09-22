@@ -8,6 +8,7 @@ import com.example.peopoolbe.community.post.domain.Category;
 import com.example.peopoolbe.community.post.domain.Post;
 import com.example.peopoolbe.community.post.domain.PostStatus;
 import com.example.peopoolbe.community.post.domain.repository.PostRepository;
+import com.example.peopoolbe.global.s3.domain.repository.ImageRepository;
 import com.example.peopoolbe.global.s3.service.S3Service;
 import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.service.MemberService;
@@ -36,12 +37,13 @@ public class PostService {
     private final PostRepository postRepository;
     private final MemberService memberService;
     private final S3Service s3Service;
+    private final ImageRepository imageRepository;
 
     @Transactional
     public ResponseEntity addPost(PostAddReq postAddReq, MultipartFile[] image, Principal principal) {
         Member member = memberService.getUserByToken(principal);
 
-        if(image.length > 5) {
+        if(image != null && image.length > 5) {
             return ResponseEntity.status(400).body("사진은 최대 5장까지 업로드 가능");
         }
         if(postAddReq.recruitmentStartDate().isAfter(postAddReq.recruitmentEndDate()))
@@ -70,10 +72,11 @@ public class PostService {
 
         postRepository.save(post);
 
-        for(MultipartFile file : image) {
-            post.updateImage(s3Service.uploadPostImage(file, post));
+        if (image != null && image.length > 0) {
+            post.updateImages(Arrays.stream(image)
+                    .map(file -> s3Service.uploadPostImage(file, post))
+                    .toList());
         }
-//        post.updateImages(Arrays.stream(s3Service.uploadPostImage(image, post)).toList());
         postRepository.save(post);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(PostInfoRes.from(post));
@@ -176,11 +179,24 @@ public class PostService {
             return ResponseEntity.status(400).body("활동 시작 날짜가 모집 날짜보다 앞섭니다.");
 
 
-        post.update(postUpdateReq.title(), postUpdateReq.content(), postUpdateReq.recruitmentStartDate(),
-                postUpdateReq.recruitmentEndDate(), postUpdateReq.activityStartDate(), postUpdateReq.maxPeople(),
-                postUpdateReq.postStatus(), postUpdateReq.category());
-        for(MultipartFile file : image) {
-            post.updateImage(s3Service.uploadPostImage(file, post));
+        post.update(
+                postUpdateReq.title(),
+                postUpdateReq.content(),
+                postUpdateReq.recruitmentStartDate(),
+                postUpdateReq.recruitmentEndDate(),
+                postUpdateReq.activityStartDate(),
+                postUpdateReq.maxPeople(),
+                postUpdateReq.postStatus(),
+                postUpdateReq.category()
+        );
+
+        imageRepository.deleteAllByPost(post);
+        if (image == null || image.length == 0) {
+            post.updateImages(List.of());
+        } else {
+            post.updateImages(Arrays.stream(image)
+                    .map(file -> s3Service.uploadPostImage(file, post))
+                    .toList());
         }
         postRepository.save(post);
 

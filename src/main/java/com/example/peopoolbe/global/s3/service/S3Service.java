@@ -87,7 +87,7 @@ public class S3Service {
             return null;
         }
 
-        imageRepository.deleteAllByPost(post);
+//        imageRepository.deleteAllByPost(post);
 
 //        Image[] images = new Image[multipartFiles.length];
 //        for(MultipartFile multipartFile : multipartFiles) {

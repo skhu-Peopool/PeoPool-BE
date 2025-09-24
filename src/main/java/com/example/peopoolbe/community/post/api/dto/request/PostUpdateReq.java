@@ -16,6 +16,7 @@ public record PostUpdateReq(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul") LocalDate activityStartDate,
         Integer maxPeople,
         PostStatus postStatus,
-        Category category
+        Category category,
+        String[] deleteImgUrl
 ) {
 }

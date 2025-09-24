@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -29,12 +31,15 @@ public class Chat extends BaseEntity {
 
     private boolean isRead = false;
 
+    private LocalDateTime readAt;
+
     @Builder
-    public Chat(String message, Member sender, Member receiver, ChatRoom chatroom, boolean isRead) {
+    public Chat(String message, Member sender, Member receiver, ChatRoom chatroom, boolean isRead, LocalDateTime readAt) {
         this.message = message;
         this.sender = sender;
         this.receiver = receiver;
         this.chatroom = chatroom;
         this.isRead = isRead;
+        this.readAt = readAt;
     }
 }

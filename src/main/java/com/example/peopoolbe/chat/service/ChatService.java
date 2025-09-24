@@ -106,7 +106,7 @@ public class ChatService {
                     .actionType(ActionType.READ_MESSAGE)
                     .targetId(chatRoom.getId())
                     .senderName(member.getNickname())
-                    .message("읽")
+                    .message("상대방이 메시지를 읽었습니다.")
                     .build();
 
             Member opponent = chatRoom.getMember1().equals(member) ? chatRoom.getMember2() : chatRoom.getMember1();

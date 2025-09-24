@@ -16,7 +16,10 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     long countByChatroomAndReceiverAndIsReadFalse(ChatRoom chatRoom, Member receiver);
 
     @Modifying
-    @Query("UPDATE Chat c SET c.isRead = true " +
-            "WHERE c.chatroom = :chatRoom AND c.receiver = :receiver AND c.isRead = false")
+    @Query("UPDATE Chat c " +
+            "SET c.isRead = true, c.readAt = CURRENT_TIMESTAMP " +
+            "WHERE c.chatroom = :chatRoom " +
+            "AND c.receiver = :receiver " +
+            "AND c.isRead = false")
     int markAsRead(ChatRoom chatRoom, Member receiver);
 }

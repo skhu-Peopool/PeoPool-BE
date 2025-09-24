@@ -1,6 +1,9 @@
 package com.example.peopoolbe.chat.service;
 
 import com.example.peopoolbe.chat.api.dto.req.MessageSendReq;
+import com.example.peopoolbe.global.sse.domain.ActionType;
+import com.example.peopoolbe.global.sse.domain.EventType;
+import com.example.peopoolbe.global.sse.dto.NotificationRes;
 import com.example.peopoolbe.chat.api.dto.res.ChatRes;
 import com.example.peopoolbe.chat.api.dto.res.ChatRoomInfo;
 import com.example.peopoolbe.chat.api.dto.res.ChatRoomListRes;
@@ -8,13 +11,12 @@ import com.example.peopoolbe.chat.domain.Chat;
 import com.example.peopoolbe.chat.domain.ChatRoom;
 import com.example.peopoolbe.chat.domain.repository.ChatRepository;
 import com.example.peopoolbe.chat.domain.repository.ChatRoomRepository;
+import com.example.peopoolbe.global.sse.SseEmitterManager;
 import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.domain.repository.MemberRepository;
 import com.example.peopoolbe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,7 @@ public class ChatService {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final SseEmitterManager sseEmitterManager;
 
     @Transactional
     public ChatRes sendMessage(Principal principal, MessageSendReq messageSendReq) {
@@ -62,7 +65,16 @@ public class ChatService {
 
         chatRoom.updateLastMessage(messageSendReq.message());
 
-        return ChatRes.from(saved);
+        NotificationRes notification = NotificationRes.builder()
+                .eventType(EventType.CHAT)
+                .actionType(ActionType.NEW_MESSAGE)
+                .targetId(chatRoom.getId())
+                .senderName(sender.getNickname())
+                .message(messageSendReq.message())
+                .build();
+        sseEmitterManager.sendToUser(receiver.getId(), notification);
+
+        return ChatRes.from(saved, sender.getId());
     }
 
     @Transactional(readOnly = true)
@@ -86,11 +98,23 @@ public class ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        chatRepository.markAsRead(chatRoom, member);
+        int updatedCount = chatRepository.markAsRead(chatRoom, member);
 
+        if (updatedCount > 0) {
+            NotificationRes readNotification = NotificationRes.builder()
+                    .eventType(EventType.CHAT)
+                    .actionType(ActionType.READ_MESSAGE)
+                    .targetId(chatRoom.getId())
+                    .senderName(member.getNickname())
+                    .message("읽")
+                    .build();
+
+            Member opponent = chatRoom.getMember1().equals(member) ? chatRoom.getMember2() : chatRoom.getMember1();
+            sseEmitterManager.sendToUser(opponent.getId(), readNotification);
+        }
         return chatRepository.findByChatroomOrderByCreatedAtAsc(chatRoom)
                 .stream()
-                .map(ChatRes::from)
+                .map(chat -> (ChatRes.from(chat, member.getId())))
                 .toList();
     }
 

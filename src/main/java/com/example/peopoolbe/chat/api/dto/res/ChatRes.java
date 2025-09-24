@@ -12,15 +12,17 @@ public record ChatRes(
         Long receiverId,
         String message,
         boolean isRead,
+        boolean isMine,
         LocalDateTime createdAt
 ) {
-    public static ChatRes from(Chat chat) {
+    public static ChatRes from(Chat chat, Long memberId) {
         return ChatRes.builder()
                 .messageId(chat.getId())
                 .senderId(chat.getSender().getId())
                 .receiverId(chat.getReceiver().getId())
                 .message(chat.getMessage())
                 .isRead(chat.isRead())
+                .isMine(chat.getSender().getId().equals(memberId))
                 .createdAt(chat.getCreatedAt())
                 .build();
     }

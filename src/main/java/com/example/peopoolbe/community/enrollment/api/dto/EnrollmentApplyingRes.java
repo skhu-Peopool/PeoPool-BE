@@ -16,7 +16,8 @@ public record EnrollmentApplyingRes(
         LocalDateTime appliedAt,
         String memberNickname,
         String memberEmail,
-        String memberProfileImage
+        String memberProfileImage,
+        String memberTags
 ) {
     public static EnrollmentApplyingRes from(Enrollment enrollment) {
         return EnrollmentApplyingRes.builder()
@@ -29,6 +30,7 @@ public record EnrollmentApplyingRes(
                 .memberNickname(enrollment.getMember().getNickname())
                 .memberEmail(enrollment.getMember().getEmail())
                 .memberProfileImage(enrollment.getMember().getProfileImage() == null ? null : enrollment.getMember().getProfileImage().getPath())
+                .memberTags(enrollment.getMember().getHashtag())
                 .build();
     }
 }

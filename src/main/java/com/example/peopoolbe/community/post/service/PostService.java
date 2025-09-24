@@ -8,6 +8,7 @@ import com.example.peopoolbe.community.post.domain.Category;
 import com.example.peopoolbe.community.post.domain.Post;
 import com.example.peopoolbe.community.post.domain.PostStatus;
 import com.example.peopoolbe.community.post.domain.repository.PostRepository;
+import com.example.peopoolbe.global.s3.domain.Image;
 import com.example.peopoolbe.global.s3.domain.repository.ImageRepository;
 import com.example.peopoolbe.global.s3.service.S3Service;
 import com.example.peopoolbe.member.domain.Member;
@@ -190,13 +191,18 @@ public class PostService {
                 postUpdateReq.category()
         );
 
-        imageRepository.deleteAllByPost(post);
+        for (String url : postUpdateReq.deleteImgUrl()) {
+            imageRepository.deleteByPath(url);
+        }
+        List<Image> imgList = imageRepository.findAllByPost(post);
+
         if (image == null || image.length == 0) {
-            post.updateImages(List.of());
+            post.updateImages(imgList);
         } else {
-            post.updateImages(Arrays.stream(image)
-                    .map(file -> s3Service.uploadPostImage(file, post))
+            imgList.addAll(Arrays.stream(image).
+                    map(file -> s3Service.uploadPostImage(file, post))
                     .toList());
+            post.updateImages(imgList);
         }
         postRepository.save(post);
 

@@ -9,6 +9,10 @@ import com.example.peopoolbe.community.enrollment.domain.repository.EnrollmentRe
 import com.example.peopoolbe.community.post.domain.Post;
 import com.example.peopoolbe.community.post.domain.repository.PostRepository;
 import com.example.peopoolbe.community.post.service.PostService;
+import com.example.peopoolbe.global.sse.SseEmitterManager;
+import com.example.peopoolbe.global.sse.domain.ActionType;
+import com.example.peopoolbe.global.sse.domain.EventType;
+import com.example.peopoolbe.global.sse.dto.NotificationRes;
 import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +32,7 @@ public class EnrollmentService {
     private final PostRepository postRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final PostService postService;
+    private final SseEmitterManager sseEmitterManager;
 
     @Transactional
     public EnrollmentApplyingRes applyEnrollment(Principal principal, Long postId, EnrollmentApplyingReq enrollmentApplyingReq) {
@@ -48,6 +53,17 @@ public class EnrollmentService {
 
         post.updateAppliedPeople(enrollmentRepository.countEnrollmentByPostId(postId));
         postRepository.save(post);
+
+        NotificationRes notification = NotificationRes.builder()
+                .eventType(EventType.ENROLLMENT)
+                .actionType(ActionType.NEW_ENROLLMENT)
+                .targetId(enrollment.getId())
+                .senderName(member.getNickname())
+                .message(member.getNickname() + "님이 " +
+                        (post.getTitle().length() > 7 ? post.getTitle().substring(7) + "..." : post.getTitle())
+                        + " 게시글에 신청하였습니다.")
+                .build();
+        sseEmitterManager.sendToUser(post.getMember().getId(), notification);
 
         return EnrollmentApplyingRes.from(enrollment);
     }
@@ -117,6 +133,16 @@ public class EnrollmentService {
         post.updateApprovedPeople(enrollmentRepository.countByPostIdAndStatusIs(post.getId(), EnrollmentStatus.APPROVED));
         postRepository.save(post);
 
+        NotificationRes notification = NotificationRes.builder()
+                .eventType(EventType.ENROLLMENT)
+                .actionType(ActionType.ENROLLMENT_DECISION)
+                .targetId(enrollment.getId())
+                .senderName(member.getNickname())
+                .message(post.getTitle().length() > 7 ? post.getTitle().substring(7) + "..." : post.getTitle()
+                + " 게시글에 지원한 결과가 나왔습니다.")
+                .build();
+        sseEmitterManager.sendToUser(enrollment.getMember().getId(), notification);
+
         return EnrollmentApplyingRes.from(enrollment);
     }
 
@@ -130,6 +156,16 @@ public class EnrollmentService {
 
         postService.checkWriter(member, post);
         enrollment.update(EnrollmentStatus.REJECTED, LocalDateTime.now());
+
+        NotificationRes notification = NotificationRes.builder()
+                .eventType(EventType.ENROLLMENT)
+                .actionType(ActionType.ENROLLMENT_DECISION)
+                .targetId(enrollment.getId())
+                .senderName(member.getNickname())
+                .message(post.getTitle().length() > 7 ? post.getTitle().substring(7) + "..." : post.getTitle()
+                        + " 게시글에 지원한 결과가 나왔습니다.")
+                .build();
+        sseEmitterManager.sendToUser(enrollment.getMember().getId(), notification);
 
         return EnrollmentApplyingRes.from(enrollment);
     }

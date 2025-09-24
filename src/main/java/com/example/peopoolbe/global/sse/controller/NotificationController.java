@@ -1,12 +1,16 @@
 package com.example.peopoolbe.global.sse.controller;
 
 import com.example.peopoolbe.global.sse.SseEmitterManager;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,8 +19,14 @@ public class NotificationController {
 
     private final SseEmitterManager sseEmitterManager;
 
+    @Operation(summary = "SSE를 활용한 알림 구독", description = "실시간 알림 수신")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "SSE 연결 성공, 이후 이벤트 전송(재연결 필요 X)"),
+            @ApiResponse(responseCode = "403", description = "토큰 없음"),
+            @ApiResponse(responseCode = "500", description = "서버 에러")
+    })
     @GetMapping("/subscribe")
-    public SseEmitter subscribe(@RequestParam Long memberId) {
-        return sseEmitterManager.createSseEmitter(memberId);
+    public SseEmitter subscribe(Principal principal) {
+        return sseEmitterManager.createSseEmitter(principal);
     }
 }

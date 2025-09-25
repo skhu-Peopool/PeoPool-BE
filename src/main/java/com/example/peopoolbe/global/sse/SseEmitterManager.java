@@ -24,12 +24,17 @@ public class SseEmitterManager {
 
     public void sendToUser(Long memberId, Object data, String eventType) {
         SseEmitter emitter = emitters.get(memberId);
+        System.out.println("sendToUser: " + memberId + ", data: " + data + ", emitter: " + emitter);
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event().name(eventType).data(data));
+                System.out.println("이벤트 전송 성공: " + eventType);
             } catch (Exception e) {
                 emitters.remove(memberId);
+                System.out.println("이벤트 전송 실패: " + e.getMessage());
             }
+        } else {
+            System.out.println("emitter is null!" + memberId);
         }
     }
 

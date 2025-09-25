@@ -194,8 +194,10 @@ public class PostService {
                 postUpdateReq.category()
         );
 
-        for (String url : postUpdateReq.deleteImgUrl()) {
-            imageRepository.deleteByPath(url);
+        if (postUpdateReq.deleteImgUrl() != null && postUpdateReq.deleteImgUrl().length > 0) {
+            for (String url : postUpdateReq.deleteImgUrl()) {
+                imageRepository.deleteByPath(url);
+            }
         }
         List<Image> imgList = imageRepository.findAllByPost(post);
 

@@ -31,7 +31,8 @@ public class NotificationController {
     })
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(Principal principal) {
-        Member member = memberService.getUserByToken(principal);
-        return sseEmitterManager.createSseEmitter(member.getId());
+        Long memberId = Long.parseLong(principal.getName());
+
+        return sseEmitterManager.createSseEmitter(memberId);
     }
 }

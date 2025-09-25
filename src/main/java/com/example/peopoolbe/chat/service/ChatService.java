@@ -11,7 +11,8 @@ import com.example.peopoolbe.chat.domain.Chat;
 import com.example.peopoolbe.chat.domain.ChatRoom;
 import com.example.peopoolbe.chat.domain.repository.ChatRepository;
 import com.example.peopoolbe.chat.domain.repository.ChatRoomRepository;
-import com.example.peopoolbe.global.sse.SseEmitterManager;
+import com.example.peopoolbe.global.sse.service.NotificationService;
+import com.example.peopoolbe.global.sse.service.SseEmitterManager;
 import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.domain.repository.MemberRepository;
 import com.example.peopoolbe.member.service.MemberService;
@@ -34,7 +35,7 @@ public class ChatService {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final ChatRoomRepository chatRoomRepository;
-    private final SseEmitterManager sseEmitterManager;
+    private final NotificationService notificationService;
 
     @Transactional
     public ChatRes sendMessage(Principal principal, MessageSendReq messageSendReq) {
@@ -72,7 +73,7 @@ public class ChatService {
                 .senderName(sender.getNickname())
                 .message(messageSendReq.message())
                 .build();
-        sseEmitterManager.sendToUser(receiver.getId(), notification, "chat");
+        notificationService.notifyUser(receiver.getId(), notification, "chat");
 
         return ChatRes.from(saved, sender.getId());
     }
@@ -110,7 +111,7 @@ public class ChatService {
                     .build();
 
             Member opponent = chatRoom.getMember1().equals(member) ? chatRoom.getMember2() : chatRoom.getMember1();
-            sseEmitterManager.sendToUser(opponent.getId(), readNotification, "chat");
+            notificationService.notifyUser(opponent.getId(), readNotification, "chat");
         }
         return chatRepository.findByChatroomOrderByCreatedAtAsc(chatRoom)
                 .stream()

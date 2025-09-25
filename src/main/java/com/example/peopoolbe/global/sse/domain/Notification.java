@@ -15,6 +15,7 @@ public class Notification extends BaseEntity {
 
     private Long receiverId;
 
+    private Long senderId;
     private String senderName;
 
     private String message;
@@ -29,8 +30,9 @@ public class Notification extends BaseEntity {
     private boolean isRead;
 
     @Builder
-    public Notification(Long receiverId, String senderName, String message, EventType eventType, ActionType actionType, Long targetId, boolean isRead) {
+    public Notification(Long receiverId, Long senderId, String senderName, String message, EventType eventType, ActionType actionType, Long targetId, boolean isRead) {
         this.receiverId = receiverId;
+        this.senderId = senderId;
         this.senderName = senderName;
         this.message = message;
         this.eventType = eventType;

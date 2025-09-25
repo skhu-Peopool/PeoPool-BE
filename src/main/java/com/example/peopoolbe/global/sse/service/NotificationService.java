@@ -39,7 +39,7 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public List<NotificationRes> getUnReadNotifications(Long receiverId) {
-        return notificationRepository.findBySenderIdAndReadFalse(receiverId).stream()
+        return notificationRepository.findByReceiverIdAndIsReadFalse(receiverId).stream()
                 .map(n -> NotificationRes.of(
                         n.getEventType(),
                         n.getActionType(),

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +49,11 @@ public class NotificationService {
                         n.getMessage(),
                         n.getCreatedAt()
                 ))
-                .toList();
+                .collect(Collectors.toList());
+    }
+
+    public void markChatNotificationsAsRead(Long receiverId, Long chatRoomId) {
+        List<Notification> notifications = notificationRepository.findByReceiverIdAndEventTypeAndTargetIdAndIsReadFalse(receiverId, EventType.CHAT, chatRoomId);
+        notifications.forEach(Notification::markAsRead);
     }
 }

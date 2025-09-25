@@ -40,4 +40,8 @@ public class Notification extends BaseEntity {
         this.targetId = targetId;
         this.isRead = isRead;
     }
+
+    public void markAsRead() {
+        this.isRead = true;
+    }
 }

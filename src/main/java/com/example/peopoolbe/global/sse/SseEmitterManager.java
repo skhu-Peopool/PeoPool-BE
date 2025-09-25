@@ -33,11 +33,11 @@ public class SseEmitterManager {
         return emitter;
     }
 
-    public void sendToUser(Long memberId, Object data) {
+    public void sendToUser(Long memberId, Object data, String eventType) {
         SseEmitter emitter = emitters.get(memberId);
         if (emitter != null) {
             try {
-                emitter.send(SseEmitter.event().name("chat").data(data));
+                emitter.send(SseEmitter.event().name(eventType).data(data));
             } catch (Exception e) {
                 emitters.remove(memberId);
             }

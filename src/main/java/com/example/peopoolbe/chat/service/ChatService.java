@@ -72,7 +72,7 @@ public class ChatService {
                 .senderName(sender.getNickname())
                 .message(messageSendReq.message())
                 .build();
-        sseEmitterManager.sendToUser(receiver.getId(), notification);
+        sseEmitterManager.sendToUser(receiver.getId(), notification, "chat");
 
         return ChatRes.from(saved, sender.getId());
     }
@@ -110,7 +110,7 @@ public class ChatService {
                     .build();
 
             Member opponent = chatRoom.getMember1().equals(member) ? chatRoom.getMember2() : chatRoom.getMember1();
-            sseEmitterManager.sendToUser(opponent.getId(), readNotification);
+            sseEmitterManager.sendToUser(opponent.getId(), readNotification, "chat");
         }
         return chatRepository.findByChatroomOrderByCreatedAtAsc(chatRoom)
                 .stream()

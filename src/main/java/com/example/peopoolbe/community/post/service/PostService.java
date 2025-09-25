@@ -179,6 +179,9 @@ public class PostService {
         if(!postUpdateReq.activityStartDate().isAfter(postUpdateReq.recruitmentEndDate()))
             return ResponseEntity.status(400).body("활동 시작 날짜가 모집 날짜보다 앞섭니다.");
 
+        if (image != null && post.getImage().size() - postUpdateReq.deleteImgUrl().length + image.length > 5) {
+            return ResponseEntity.status(400).body("사진은 최대 5장까지 업로드 가능");
+        }
 
         post.update(
                 postUpdateReq.title(),

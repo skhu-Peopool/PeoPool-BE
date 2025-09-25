@@ -1,4 +1,4 @@
-package com.example.peopoolbe.global.sse;
+package com.example.peopoolbe.global.sse.service;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -22,20 +22,19 @@ public class SseEmitterManager {
         return emitter;
     }
 
-    public void sendToUser(Long memberId, Object data, String eventType) {
+    public boolean sendToUser(Long memberId, Object data, String eventType) {
         SseEmitter emitter = emitters.get(memberId);
         System.out.println("sendToUser: " + memberId + ", data: " + data + ", emitter: " + emitter);
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event().name(eventType).data(data));
-                System.out.println("이벤트 전송 성공: " + eventType);
+                return true;
             } catch (Exception e) {
                 emitters.remove(memberId);
-                System.out.println("이벤트 전송 실패: " + e.getMessage());
+                return false;
             }
-        } else {
-            System.out.println("emitter is null!" + memberId);
         }
+        return false;
     }
 
     @Scheduled(fixedRate = 25_000)

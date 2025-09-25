@@ -9,7 +9,8 @@ import com.example.peopoolbe.community.enrollment.domain.repository.EnrollmentRe
 import com.example.peopoolbe.community.post.domain.Post;
 import com.example.peopoolbe.community.post.domain.repository.PostRepository;
 import com.example.peopoolbe.community.post.service.PostService;
-import com.example.peopoolbe.global.sse.SseEmitterManager;
+import com.example.peopoolbe.global.sse.service.NotificationService;
+import com.example.peopoolbe.global.sse.service.SseEmitterManager;
 import com.example.peopoolbe.global.sse.domain.ActionType;
 import com.example.peopoolbe.global.sse.domain.EventType;
 import com.example.peopoolbe.global.sse.dto.NotificationRes;
@@ -32,7 +33,7 @@ public class EnrollmentService {
     private final PostRepository postRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final PostService postService;
-    private final SseEmitterManager sseEmitterManager;
+    private final NotificationService notificationService;
 
     @Transactional
     public EnrollmentApplyingRes applyEnrollment(Principal principal, Long postId, EnrollmentApplyingReq enrollmentApplyingReq) {
@@ -65,7 +66,7 @@ public class EnrollmentService {
                 .message(member.getNickname() + "님이 " +
                         post.getTitle() + " 게시글에 신청하였습니다.")
                 .build();
-        sseEmitterManager.sendToUser(post.getMember().getId(), notification, "enrollment");
+        notificationService.notifyUser(post.getMember().getId(), notification, "enrollment");
 
         return EnrollmentApplyingRes.from(enrollment);
     }
@@ -144,7 +145,7 @@ public class EnrollmentService {
 //                + " 게시글에 지원한 결과가 나왔습니다.")
                 .message(post.getTitle() + " 게시글에 지원한 결과가 나왔습니다.")
                 .build();
-        sseEmitterManager.sendToUser(enrollment.getMember().getId(), notification, "enrollment");
+        notificationService.notifyUser(enrollment.getMember().getId(), notification, "enrollment");
 
         return EnrollmentApplyingRes.from(enrollment);
     }
@@ -169,7 +170,7 @@ public class EnrollmentService {
 //                        + " 게시글에 지원한 결과가 나왔습니다.")
                 .message(post.getTitle() + " 게시글에 지원한 결과가 나왔습니다.")
                 .build();
-        sseEmitterManager.sendToUser(enrollment.getMember().getId(), notification, "enrollment");
+        notificationService.notifyUser(enrollment.getMember().getId(), notification, "enrollment");
 
         return EnrollmentApplyingRes.from(enrollment);
     }

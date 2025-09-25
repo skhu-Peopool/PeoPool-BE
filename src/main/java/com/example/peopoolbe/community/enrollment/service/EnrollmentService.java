@@ -59,9 +59,11 @@ public class EnrollmentService {
                 .actionType(ActionType.NEW_ENROLLMENT)
                 .targetId(enrollment.getId())
                 .senderName(member.getNickname())
+//                .message(member.getNickname() + "님이 " +
+//                        (post.getTitle().length() > 7 ? post.getTitle().substring(7) + "..." : post.getTitle())
+//                        + " 게시글에 신청하였습니다.")
                 .message(member.getNickname() + "님이 " +
-                        (post.getTitle().length() > 7 ? post.getTitle().substring(7) + "..." : post.getTitle())
-                        + " 게시글에 신청하였습니다.")
+                        post.getTitle() + " 게시글에 신청하였습니다.")
                 .build();
         sseEmitterManager.sendToUser(post.getMember().getId(), notification, "enrollment");
 
@@ -138,8 +140,9 @@ public class EnrollmentService {
                 .actionType(ActionType.ENROLLMENT_DECISION)
                 .targetId(enrollment.getId())
                 .senderName(member.getNickname())
-                .message(post.getTitle().length() > 7 ? post.getTitle().substring(7) + "..." : post.getTitle()
-                + " 게시글에 지원한 결과가 나왔습니다.")
+//                .message(post.getTitle().length() > 7 ? post.getTitle().substring(7) + "..." : post.getTitle()
+//                + " 게시글에 지원한 결과가 나왔습니다.")
+                .message(post.getTitle() + " 게시글에 지원한 결과가 나왔습니다.")
                 .build();
         sseEmitterManager.sendToUser(enrollment.getMember().getId(), notification, "enrollment");
 
@@ -162,8 +165,9 @@ public class EnrollmentService {
                 .actionType(ActionType.ENROLLMENT_DECISION)
                 .targetId(enrollment.getId())
                 .senderName(member.getNickname())
-                .message(post.getTitle().length() > 7 ? post.getTitle().substring(7) + "..." : post.getTitle()
-                        + " 게시글에 지원한 결과가 나왔습니다.")
+//                .message(post.getTitle().length() > 7 ? post.getTitle().substring(7) + "..." : post.getTitle()
+//                        + " 게시글에 지원한 결과가 나왔습니다.")
+                .message(post.getTitle() + " 게시글에 지원한 결과가 나왔습니다.")
                 .build();
         sseEmitterManager.sendToUser(enrollment.getMember().getId(), notification, "enrollment");
 

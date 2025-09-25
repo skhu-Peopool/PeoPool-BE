@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,7 +39,9 @@ public class NotificationController {
 
         List<NotificationRes> unReadList = notificationService.getUnReadNotifications(memberId);
         if(!unReadList.isEmpty()) {
-            sseEmitterManager.sendToUser(memberId, unReadList, "initial-notifications");
+            CompletableFuture.runAsync(() -> {
+                sseEmitterManager.sendToUser(memberId, unReadList, "initial-notifications");
+            });
         }
 
         return sseEmitter;

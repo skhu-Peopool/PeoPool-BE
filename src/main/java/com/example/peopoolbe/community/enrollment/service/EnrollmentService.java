@@ -63,7 +63,7 @@ public class EnrollmentService {
                         (post.getTitle().length() > 7 ? post.getTitle().substring(7) + "..." : post.getTitle())
                         + " 게시글에 신청하였습니다.")
                 .build();
-        sseEmitterManager.sendToUser(post.getMember().getId(), notification);
+        sseEmitterManager.sendToUser(post.getMember().getId(), notification, "enrollment");
 
         return EnrollmentApplyingRes.from(enrollment);
     }
@@ -141,7 +141,7 @@ public class EnrollmentService {
                 .message(post.getTitle().length() > 7 ? post.getTitle().substring(7) + "..." : post.getTitle()
                 + " 게시글에 지원한 결과가 나왔습니다.")
                 .build();
-        sseEmitterManager.sendToUser(enrollment.getMember().getId(), notification);
+        sseEmitterManager.sendToUser(enrollment.getMember().getId(), notification, "enrollment");
 
         return EnrollmentApplyingRes.from(enrollment);
     }
@@ -165,7 +165,7 @@ public class EnrollmentService {
                 .message(post.getTitle().length() > 7 ? post.getTitle().substring(7) + "..." : post.getTitle()
                         + " 게시글에 지원한 결과가 나왔습니다.")
                 .build();
-        sseEmitterManager.sendToUser(enrollment.getMember().getId(), notification);
+        sseEmitterManager.sendToUser(enrollment.getMember().getId(), notification, "enrollment");
 
         return EnrollmentApplyingRes.from(enrollment);
     }

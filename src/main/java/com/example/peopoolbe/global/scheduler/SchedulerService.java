@@ -3,11 +3,14 @@ package com.example.peopoolbe.global.scheduler;
 import com.example.peopoolbe.community.post.domain.Post;
 import com.example.peopoolbe.community.post.domain.PostStatus;
 import com.example.peopoolbe.community.post.domain.repository.PostRepository;
+import com.example.peopoolbe.global.jwt.domain.RefreshToken;
+import com.example.peopoolbe.global.jwt.domain.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -15,6 +18,7 @@ import java.util.List;
 public class SchedulerService {
 
     private final PostRepository postRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Scheduled(zone = "Asia/Seoul", cron = "1 0 0 * * *")
     public void updatePostStatus() {
@@ -31,6 +35,16 @@ public class SchedulerService {
                     post.updateStatus(PostStatus.RECRUITING);
                     postRepository.save(post);
                 }
+        }
+    }
+
+    @Scheduled(zone = "Asia/Seoul", cron = "1 0 0 * * *")
+    public void deleteRefreshToken() {
+        List<RefreshToken> refreshTokenList = refreshTokenRepository.findAll();
+        for (RefreshToken refreshToken : refreshTokenList) {
+            if (refreshToken.getCreatedAt().plusWeeks(2).isBefore(LocalDateTime.now())) {
+                refreshTokenRepository.delete(refreshToken);
+            }
         }
     }
 }

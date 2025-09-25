@@ -37,12 +37,12 @@ public class NotificationController {
         Long memberId = Long.parseLong(principal.getName());
         SseEmitter sseEmitter = sseEmitterManager.createSseEmitter(memberId);
 
-        List<NotificationRes> unReadList = notificationService.getUnReadNotifications(memberId);
-        if(!unReadList.isEmpty()) {
-            CompletableFuture.runAsync(() -> {
+        CompletableFuture.runAsync(() -> {
+            List<NotificationRes> unReadList = notificationService.getUnReadNotifications(memberId);
+            if (!unReadList.isEmpty()) {
                 sseEmitterManager.sendToUser(memberId, unReadList, "initial-notifications");
-            });
-        }
+            }
+        });
 
         return sseEmitter;
     }

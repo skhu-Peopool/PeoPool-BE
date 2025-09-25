@@ -102,6 +102,8 @@ public class ChatService {
         int updatedCount = chatRepository.markAsRead(chatRoom, member);
 
         if (updatedCount > 0) {
+            notificationService.markChatNotificationsAsRead(member.getId(), chatRoom.getId());
+
             NotificationRes readNotification = NotificationRes.builder()
                     .eventType(EventType.CHAT)
                     .actionType(ActionType.READ_MESSAGE)

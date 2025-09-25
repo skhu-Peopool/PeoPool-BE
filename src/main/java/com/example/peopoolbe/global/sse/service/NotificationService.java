@@ -50,4 +50,9 @@ public class NotificationService {
                 ))
                 .toList();
     }
+
+    public void markChatNotificationsAsRead(Long receiverId, Long chatRoomId) {
+        List<Notification> notifications = notificationRepository.findByReceiverIdAndEventTypeAndTargetIdAndIsReadFalse(receiverId, EventType.CHAT, chatRoomId);
+        notifications.forEach(Notification::markAsRead);
+    }
 }

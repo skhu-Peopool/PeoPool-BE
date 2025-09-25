@@ -1,12 +1,9 @@
 package com.example.peopoolbe.global.sse;
 
-import com.example.peopoolbe.member.domain.Member;
-import com.example.peopoolbe.member.service.MemberService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.security.Principal;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,16 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SseEmitterManager {
 
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
-    private final MemberService memberService;
 
-    public SseEmitterManager(MemberService memberService) {
-        this.memberService = memberService;
-    }
-
-    public SseEmitter createSseEmitter(Principal principal) {
-        Member member = memberService.getUserByToken(principal);
-        Long memberId = member.getId();
-        
+    public SseEmitter createSseEmitter(Long memberId) {
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
         emitters.put(memberId, emitter);
 

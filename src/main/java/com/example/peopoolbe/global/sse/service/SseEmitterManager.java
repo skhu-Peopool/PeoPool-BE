@@ -24,7 +24,7 @@ public class SseEmitterManager {
 
     public boolean sendToUser(Long memberId, Object data, String eventType) {
         SseEmitter emitter = emitters.get(memberId);
-        System.out.println("sendToUser: " + memberId + ", data: " + data + ", emitter: " + emitter);
+//        System.out.println("sendToUser: " + memberId + ", data: " + data + ", emitter: " + emitter);
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event().name(eventType).data(data));

@@ -14,7 +14,10 @@ public class LoggingMdcFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         try {
             if (request instanceof HttpServletRequest httpRequest) {
-                String ip = httpRequest.getRemoteAddr();
+                String ip = httpRequest.getHeader("X-Forwarded-For");
+                if (ip == null) {
+                    ip = httpRequest.getRemoteAddr();
+                }
 
                 String userAgent = httpRequest.getHeader("User-Agent");
 

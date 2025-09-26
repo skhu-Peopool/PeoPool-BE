@@ -41,6 +41,9 @@ public class Member extends BaseEntity {
     @Column(name = "USER_KAKAOTALK_ID")
     private String kakaoId;
 
+    @Column(name = "USER_PROFILE_UPDATED")
+    private boolean isUpdated = false;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "USER_ROLE", nullable = false)
     private Role role;
@@ -109,6 +112,10 @@ public class Member extends BaseEntity {
 
     public void updatePassword(String password) {
         this.password = password;
+    }
+
+    public void markAsUpdated() {
+        isUpdated = true;
     }
 
 //    public void updateImage(String profileImage) {

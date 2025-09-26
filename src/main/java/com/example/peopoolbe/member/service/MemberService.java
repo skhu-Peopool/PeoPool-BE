@@ -105,6 +105,11 @@ public class MemberService {
                 memberProfileUpdateReq.kakaoId(),
                 (s3Service.uploadProfileImage(image, member)));
 
+        if (memberProfileUpdateReq.mainIntroduction() != null && !memberProfileUpdateReq.mainIntroduction().isEmpty())
+            if (memberProfileUpdateReq.hashtag() != null && !memberProfileUpdateReq.hashtag().isEmpty())
+                if (memberProfileUpdateReq.subIntroduction() != null && !memberProfileUpdateReq.subIntroduction().isEmpty())
+                    member.markAsUpdated();
+
         memberRepository.save(member);
 
         return UserInfo.from(member);

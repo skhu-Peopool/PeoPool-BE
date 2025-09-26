@@ -10,15 +10,16 @@ import com.example.peopoolbe.community.post.domain.Post;
 import com.example.peopoolbe.community.post.domain.repository.PostRepository;
 import com.example.peopoolbe.community.post.service.PostService;
 import com.example.peopoolbe.global.sse.service.NotificationService;
-import com.example.peopoolbe.global.sse.service.SseEmitterManager;
 import com.example.peopoolbe.global.sse.domain.ActionType;
 import com.example.peopoolbe.global.sse.domain.EventType;
 import com.example.peopoolbe.global.sse.dto.NotificationRes;
 import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -40,6 +41,10 @@ public class EnrollmentService {
         Member member = memberService.getUserByToken(principal);
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
+        if (!member.isUpdated()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "프로필을 먼저 수정해 주세요!");
+        }
 
         if(enrollmentRepository.existsByMemberAndPostAndStatusIsNot(member, post, EnrollmentStatus.REJECTED))
             throw new IllegalArgumentException("이미 신청된 목록입니다.");
@@ -81,6 +86,15 @@ public class EnrollmentService {
                 .toList();
 
         return EnrollmentApplyingList.fromApplyingRes(enrollmentApplyingList);
+    }
+
+    public EnrollmentApplyingList getApplyingListByMemberApproved(Principal principal) {
+        Member member = memberService.getUserByToken(principal);
+        List<Enrollment> enrollmentList = enrollmentRepository.findAllByMemberAndStatus(member, EnrollmentStatus.APPROVED);
+
+        return EnrollmentApplyingList.fromApplyingRes(enrollmentList.stream()
+                .map(EnrollmentApplyingRes::from)
+                .toList());
     }
 
     public EnrollmentApplyingList getApplyingListByPost(Principal principal, Long postId) {

@@ -43,6 +43,11 @@ public class EnrollmentController {
         return ResponseEntity.ok(enrollmentService.getApplyingListByMember(principal));
     }
 
+    @GetMapping("/member/approved")
+    public ResponseEntity<EnrollmentApplyingList> getApplyingListByMemberApproved(Principal principal) {
+        return ResponseEntity.ok(enrollmentService.getApplyingListByMemberApproved(principal));
+    }
+
     @Operation(summary = "게시글에 신청한 목록 조회", description = "게시글 ID로 게시글 조회 후 그 게시글의 신청 목록 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공"),

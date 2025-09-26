@@ -46,10 +46,6 @@ public class SecurityConfig{
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(authenticationEntryPoint())
                 )
-
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().authenticated()
-                )
                 .addFilterBefore(new JwtFilter(tokenprovider), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

@@ -16,6 +16,7 @@ import com.example.peopoolbe.global.sse.dto.NotificationRes;
 import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EnrollmentService {
 
     private final MemberService memberService;
@@ -43,11 +45,14 @@ public class EnrollmentService {
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
         if (!member.isUpdated()) {
+            log.warn("member must update profile before applying enrollment - memberId: {}", member.getId());
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "프로필을 먼저 수정해 주세요!");
         }
 
-        if(enrollmentRepository.existsByMemberAndPostAndStatusIsNot(member, post, EnrollmentStatus.REJECTED))
+        if(enrollmentRepository.existsByMemberAndPostAndStatusIsNot(member, post, EnrollmentStatus.REJECTED)) {
+            log.warn("already applied enrollment - memberId: {}, postId: {}", member.getId(), postId);
             throw new IllegalArgumentException("이미 신청된 목록입니다.");
+        }
 
         Enrollment enrollment = Enrollment.builder()
                 .member(member)
@@ -59,6 +64,7 @@ public class EnrollmentService {
 
         post.updateAppliedPeople(enrollmentRepository.countEnrollmentByPostId(postId));
         postRepository.save(post);
+        log.info("applying enrollment success - memberId: {}, postId: {}", member.getId(), postId);
 
         NotificationRes notification = NotificationRes.builder()
                 .eventType(EventType.ENROLLMENT)
@@ -133,13 +139,16 @@ public class EnrollmentService {
         enrollmentRepository.delete(enrollment);
 
         post.updateAppliedPeople(enrollmentRepository.countEnrollmentByPostId(post.getId()));
+
+        log.info("cancel enrollment - memberId: {}, postId: {}", member.getId(), postId);
+
         postRepository.save(post);
     }
 
     @Transactional
-    public EnrollmentApplyingRes approveEnrollment(Principal principal, Long EnrollmentId) {
+    public EnrollmentApplyingRes approveEnrollment(Principal principal, Long enrollmentId) {
         Member member = memberService.getUserByToken(principal);
-        Enrollment enrollment = enrollmentRepository.findById(EnrollmentId)
+        Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 신청 내역입니다."));
         Post post = postRepository.findById(enrollment.getPost().getId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
@@ -149,6 +158,8 @@ public class EnrollmentService {
 
         post.updateApprovedPeople(enrollmentRepository.countByPostIdAndStatusIs(post.getId(), EnrollmentStatus.APPROVED));
         postRepository.save(post);
+
+        log.info("approve enrollment - memberId: {}, postId: {}, enrollmentId: {}", member.getId(), post.getId(), enrollmentId);
 
         NotificationRes notification = NotificationRes.builder()
                 .eventType(EventType.ENROLLMENT)
@@ -165,15 +176,17 @@ public class EnrollmentService {
     }
 
     @Transactional
-    public EnrollmentApplyingRes rejectEnrollment(Principal principal, Long EnrollmentId) {
+    public EnrollmentApplyingRes rejectEnrollment(Principal principal, Long enrollmentId) {
         Member member = memberService.getUserByToken(principal);
-        Enrollment enrollment = enrollmentRepository.findById(EnrollmentId)
+        Enrollment enrollment = enrollmentRepository.findById(enrollmentId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 신청 내역입니다."));
         Post post = postRepository.findById(enrollment.getPost().getId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
 
         postService.checkWriter(member, post);
         enrollment.update(EnrollmentStatus.REJECTED, LocalDateTime.now());
+
+        log.info("reject enrollment - memberId: {}, postId: {}, enrollmentId: {}", member.getId(), post.getId(), enrollmentId);
 
         NotificationRes notification = NotificationRes.builder()
                 .eventType(EventType.ENROLLMENT)

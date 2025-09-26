@@ -14,6 +14,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.security.Principal;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -51,6 +53,8 @@ public class MemberService {
                 .build();
         memberRepository.save(member);
 
+        log.info("signUp success - email: {}, nickname: {}", member.getEmail(), member.getNickname());
+
         TokenResDto tokenResDto = tokenProvider.createToken(member);
 //        member.addRefreshToken(refreshTokenRepository.findByRefreshToken(tokenResDto.refreshToken()));
 
@@ -64,9 +68,12 @@ public class MemberService {
         Member member = memberRepository.findByEmail(memberLoginReq.email())
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 멤버"));
 
-        if (!passwordEncoder.matches(memberLoginReq.password(), member.getPassword()))
+        if (!passwordEncoder.matches(memberLoginReq.password(), member.getPassword())) {
+            log.warn("login failed - email: {}, password incorrect", member.getEmail());
             throw new RuntimeException("비밀번호 불일치");
+        }
 
+        log.info("login success - email: {}, nickname: {}", member.getEmail(), member.getNickname());
         TokenResDto tokenResDto = tokenProvider.createToken(member);
 
 //        member.addRefreshToken(refreshTokenRepository.findByRefreshToken(tokenResDto.refreshToken()));
@@ -110,6 +117,7 @@ public class MemberService {
                 if (memberProfileUpdateReq.subIntroduction() != null && !memberProfileUpdateReq.subIntroduction().isEmpty())
                     member.markAsUpdated();
 
+        log.info("update success - email: {}, nickname: {}", member.getEmail(), member.getNickname());
         memberRepository.save(member);
 
         return UserInfo.from(member);
@@ -121,6 +129,8 @@ public class MemberService {
         member.updateProfileVisibility(memberVisibilityUpdateReq.visible());
         memberRepository.save(member);
 
+        log.info("updateProfileVisibility success - email: {}, visibility: {}", member.getEmail(), memberVisibilityUpdateReq.visible());
+
         return member.getProfileVisible();
     }
 
@@ -130,6 +140,8 @@ public class MemberService {
         member.updateActivityVisibility(memberVisibilityUpdateReq.visible());
         memberRepository.save(member);
 
+        log.info("updateActivityVisibility success - email: {}, visibility: {}", member.getEmail(), memberVisibilityUpdateReq.visible());
+
         return member.getActivityVisible();
     }
 
@@ -138,6 +150,8 @@ public class MemberService {
         Member member = getUserByToken(principal);
         member.updatePostVisibility(memberVisibilityUpdateReq.visible());
         memberRepository.save(member);
+
+        log.info("updatePostVisibility success - email: {}, visibility: {}", member.getEmail(), memberVisibilityUpdateReq.visible());
 
         return member.getPostVisible();
     }
@@ -149,6 +163,7 @@ public class MemberService {
 
         member.updatePassword(passwordEncoder.encode(memberPwdForgotReq.newPassword()));
         memberRepository.save(member);
+        log.info("changePwd success - email: {}", member.getEmail());
     }
 
     @Transactional
@@ -159,6 +174,7 @@ public class MemberService {
 
         member.updatePassword(passwordEncoder.encode(memberPwdUpdateReq.newPassword()));
         memberRepository.save(member);
+        log.info("updatePwd success - email: {}", member.getEmail());
 
         return UserInfo.builder()
                 .id(member.getId())
@@ -214,5 +230,7 @@ public class MemberService {
         refreshCookie.setSecure(true);
         refreshCookie.setAttribute("SameSite", "None");
         response.addCookie(refreshCookie);
+
+        log.info("logout success");
     }
 }

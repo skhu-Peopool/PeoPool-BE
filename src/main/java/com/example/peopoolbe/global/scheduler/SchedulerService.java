@@ -6,6 +6,7 @@ import com.example.peopoolbe.community.post.domain.repository.PostRepository;
 import com.example.peopoolbe.global.jwt.domain.RefreshToken;
 import com.example.peopoolbe.global.jwt.domain.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SchedulerService {
 
     private final PostRepository postRepository;
@@ -36,6 +38,7 @@ public class SchedulerService {
                     postRepository.save(post);
                 }
         }
+        log.info("Update post status with scheduler");
     }
 
     @Scheduled(zone = "Asia/Seoul", cron = "1 0 0 * * *")
@@ -46,5 +49,6 @@ public class SchedulerService {
                 refreshTokenRepository.delete(refreshToken);
             }
         }
+        log.info("delete refreshTokens with scheduler");
     }
 }

@@ -6,6 +6,7 @@ import com.example.peopoolbe.global.sse.domain.Notification;
 import com.example.peopoolbe.global.sse.domain.repository.NotificationRepository;
 import com.example.peopoolbe.global.sse.dto.NotificationRes;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
@@ -31,10 +33,12 @@ public class NotificationService {
                 .isRead(false)
                 .build();
         notificationRepository.save(notification);
+        log.info("{} notification notified - receiverId: {}, message: {}", eventType, receiverId, notificationRes.message());
 
         boolean sent = sseEmitterManager.sendToUser(receiverId, notification, eventType);
         if (!sent) {
-            System.out.println("유저가 접속 중이 아님, DB에만 저장됨");
+            log.info("id:{} user is offline", receiverId);
+//            System.out.println("유저가 접속 중이 아님, DB에만 저장됨");
         }
     }
 

@@ -15,6 +15,7 @@ import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.service.MemberService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +34,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PostService {
 
     private final PostRepository postRepository;
@@ -79,6 +81,8 @@ public class PostService {
                     .toList());
         }
         postRepository.save(post);
+
+        log.info("add post success - postId: {}, title: {}", post.getId(), post.getTitle());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(PostInfoRes.from(post));
     }
@@ -141,6 +145,8 @@ public class PostService {
 
         List<Post> posts = member.getPosts();
 
+        log.info("get posts memberId: {}", member.getId());
+
         return PostListRes.builder()
                 .totalCount(posts.size())
                 .postList(posts.stream().map(PostInfoRes::from).toList())
@@ -153,33 +159,54 @@ public class PostService {
         Post post = getPostByPostId(postId);
 
         checkWriter(member, post);
-        if(postUpdateReq.recruitmentStartDate().isAfter(postUpdateReq.recruitmentEndDate()))
+        if (postUpdateReq.recruitmentStartDate().isAfter(postUpdateReq.recruitmentEndDate())) {
+            log.warn("Validation failed: recruitmentStartDate={} is after recruitmentEndDate={}", postUpdateReq.recruitmentStartDate(), postUpdateReq.recruitmentEndDate());
             return ResponseEntity.status(400).body("날짜의 순서가 올바르지 않음");
+        }
+
         if (!post.getRecruitmentStartDate().isEqual(postUpdateReq.recruitmentStartDate())) {
             if (postUpdateReq.recruitmentStartDate().isBefore(LocalDate.now())) {
+                log.warn("Validation failed: recruitmentStartDate={} is before today", postUpdateReq.recruitmentStartDate());
                 return ResponseEntity.status(400).body("수정된 모집 시작 날짜가 현재 날짜보다 앞섭니다.");
             }
-            if (postUpdateReq.recruitmentStartDate().isEqual(LocalDate.now())
-                    && postUpdateReq.postStatus() == PostStatus.UPCOMING) {
+            if (postUpdateReq.recruitmentStartDate().isEqual(LocalDate.now()) && postUpdateReq.postStatus() == PostStatus.UPCOMING) {
+                log.warn("Validation failed: recruitmentStartDate is today but postStatus=UPCOMING is not allowed");
                 return ResponseEntity.status(400).body("모집 중에는 모집 예정으로 변경할 수 없습니다.");
             }
         }
-        if(!post.getActivityStartDate().isEqual(postUpdateReq.activityStartDate()))
-            if(postUpdateReq.activityStartDate().isBefore(LocalDate.now()))
-                return ResponseEntity.status(400).body("수정된 활동 시작 날짜가 현재 날짜보다 앞섭니다.");
-        if(postUpdateReq.recruitmentStartDate().isAfter(LocalDate.now()))
-            if(postUpdateReq.postStatus() != PostStatus.UPCOMING)
-                return ResponseEntity.status(400).body("모집 시작일 전에는 모집 속성을 변경할 수 없습니다.");
-        if(LocalDate.now().isAfter(postUpdateReq.recruitmentEndDate()))
-            if(postUpdateReq.postStatus() != PostStatus.RECRUITED)
-                return ResponseEntity.status(400).body("모집 마감일 후에는 모집 속성을 변경할 수 없습니다.");
-        if(!LocalDate.now().isBefore(postUpdateReq.recruitmentStartDate()) && !LocalDate.now().isAfter(postUpdateReq.recruitmentEndDate()))
-            if(postUpdateReq.postStatus() != PostStatus.RECRUITING && postUpdateReq.postStatus() != PostStatus.UNDER_REVIEW)
-                return ResponseEntity.status(400).body("모집 중에는 모집 속성을 모집 중 또는 검토 중으로만 변경 가능합니다.");
-        if(!postUpdateReq.activityStartDate().isAfter(postUpdateReq.recruitmentEndDate()))
+
+        if (!post.getActivityStartDate().isEqual(postUpdateReq.activityStartDate())  && postUpdateReq.activityStartDate().isBefore(LocalDate.now())) {
+            log.warn("Validation failed: activityStartDate={} is before today", postUpdateReq.activityStartDate());
+            return ResponseEntity.status(400).body("수정된 활동 시작 날짜가 현재 날짜보다 앞섭니다.");
+        }
+
+        if (postUpdateReq.recruitmentStartDate().isAfter(LocalDate.now()) && postUpdateReq.postStatus() != PostStatus.UPCOMING) {
+            log.warn("Validation failed: recruitmentStartDate={} is after now, but postStatus={}", postUpdateReq.recruitmentStartDate(), postUpdateReq.postStatus());
+            return ResponseEntity.status(400).body("모집 시작일 전에는 모집 속성을 변경할 수 없습니다.");
+        }
+
+        if (LocalDate.now().isAfter(postUpdateReq.recruitmentEndDate()) && postUpdateReq.postStatus() != PostStatus.RECRUITED) {
+            log.warn("Validation failed: today is after recruitmentEndDate={}, but postStatus={}", postUpdateReq.recruitmentEndDate(), postUpdateReq.postStatus());
+            return ResponseEntity.status(400).body("모집 마감일 후에는 모집 속성을 변경할 수 없습니다.");
+        }
+
+        if (!LocalDate.now().isBefore(postUpdateReq.recruitmentStartDate())
+                && !LocalDate.now().isAfter(postUpdateReq.recruitmentEndDate())
+                && postUpdateReq.postStatus() != PostStatus.RECRUITING
+                && postUpdateReq.postStatus() != PostStatus.UNDER_REVIEW) {
+            log.warn("Validation failed: today is between recruitmentStartDate={} and recruitmentEndDate={}, but postStatus={}",
+                    postUpdateReq.recruitmentStartDate(), postUpdateReq.recruitmentEndDate(), postUpdateReq.postStatus());
+            return ResponseEntity.status(400).body("모집 중에는 모집 속성을 모집 중 또는 검토 중으로만 변경 가능합니다.");
+        }
+
+        if (!postUpdateReq.activityStartDate().isAfter(postUpdateReq.recruitmentEndDate())) {
+            log.warn("Validation failed: activityStartDate={} is not after recruitmentEndDate={}", postUpdateReq.activityStartDate(), postUpdateReq.recruitmentEndDate());
             return ResponseEntity.status(400).body("활동 시작 날짜가 모집 날짜보다 앞섭니다.");
+        }
 
         if (image != null && post.getImage().size() - postUpdateReq.deleteImgUrl().length + image.length > 5) {
+            log.warn("Validation failed: image count exceeded, max=5. current={}, deleteRequest={}, newUpload={}",
+                    post.getImage().size(), postUpdateReq.deleteImgUrl().length, image.length);
             return ResponseEntity.status(400).body("사진은 최대 5장까지 업로드 가능");
         }
 
@@ -210,6 +237,7 @@ public class PostService {
             post.updateImages(imgList);
         }
         postRepository.save(post);
+        log.info("update post success - postId: {}, title: {}", post.getId(), post.getTitle());
 
         return ResponseEntity.ok(PostInfoRes.from(post));
     }
@@ -219,6 +247,8 @@ public class PostService {
         Member member = memberService.getUserByToken(principal);
         Post post = getPostByPostId(postId);
         checkWriter(member, post);
+
+        log.info("delete post success - postId: {}", postId);
 
         postRepository.delete(post);
     }
@@ -230,6 +260,7 @@ public class PostService {
 
     public void checkWriter(Member member, Post post) {
         if (!post.getMember().getId().equals(member.getId())) {
+            log.warn("is not writer memberId: {}, postId: {}", member.getId(), post.getId());
             throw new IllegalArgumentException("접근 권한 없음");
         }
     }

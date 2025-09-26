@@ -1,11 +1,11 @@
 package com.example.peopoolbe.global.jwt.service;
 
+import com.example.peopoolbe.global.jwt.exception.JwtAuthenticationException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,8 +24,6 @@ public class JwtFilter extends GenericFilterBean {
             throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
-
         String token = tokenProvider.resolveToken(httpRequest);
 
         if (StringUtils.hasText(token)) {
@@ -33,8 +31,7 @@ public class JwtFilter extends GenericFilterBean {
                 Authentication authentication = tokenProvider.getAuthentication(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } else {
-                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid or expired token");
-                return; // ❗ 여기서 더 진행하지 않고 종료
+                throw new JwtAuthenticationException("Invalid or expired token");
             }
         }
 

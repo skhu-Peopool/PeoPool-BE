@@ -17,6 +17,7 @@ import com.example.peopoolbe.member.domain.Member;
 import com.example.peopoolbe.member.domain.repository.MemberRepository;
 import com.example.peopoolbe.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatService {
 
     private final ChatRepository chatRepository;
@@ -44,9 +46,11 @@ public class ChatService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "존재하지 않는 멤버입니다."));
 
         if (sender.getId().equals(receiver.getId())) {
+            log.warn("cannot chat myself - memberId: {}", messageSendReq.receiverId());
             throw new IllegalArgumentException("본인에게는 메시지를 보낼 수 없습니다.");
         }
         if (!StringUtils.hasText(messageSendReq.message())) {
+            log.warn("message cannot be empty - memberId: {}", sender.getId());
             throw new IllegalArgumentException("메시지는 비어있을 수 없습니다.");
         }
 
@@ -63,6 +67,8 @@ public class ChatService {
                 .message(messageSendReq.message())
                 .build();
         Chat saved = chatRepository.save(chat);
+
+        log.info("send chat success - senderId: {}, receiverId: {}, message: {}, chatroom: {}", sender.getId(), receiver.getId(), messageSendReq.message(), chatRoom.getId());
 
         chatRoom.updateLastMessage(messageSendReq.message());
 

@@ -11,6 +11,7 @@ import com.example.peopoolbe.global.s3.domain.ImageType;
 import com.example.peopoolbe.global.s3.domain.repository.ImageRepository;
 import com.example.peopoolbe.member.domain.Member;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class S3Service {
@@ -63,6 +65,7 @@ public class S3Service {
     @Transactional
     public Image uploadProfileImage(MultipartFile multipartFile, Member member) {
         if(multipartFile == null || multipartFile.isEmpty()) {
+            log.info("Update Profile Image is null or empty");
             return null;
         }
         imageRepository.deleteByMember(member);
@@ -77,6 +80,7 @@ public class S3Service {
                 .member(member)
                 .build();
         imageRepository.save(image);
+        log.info("Profile Image uploaded successfully - email: {}, nickname: {}", member.getEmail(), member.getNickname());
 
         return image;
     }
@@ -84,6 +88,7 @@ public class S3Service {
     @Transactional
     public Image uploadPostImage(MultipartFile multipartFile, Post post) {
         if(multipartFile == null || multipartFile.isEmpty()) {
+            log.info("Update Post Image is null or empty");
             return null;
         }
 
@@ -116,6 +121,7 @@ public class S3Service {
         String fileName = prefix + multipartFile.getOriginalFilename();
         awsImageUpload(multipartFile, fileName);
 
+        log.info("Post Image uploaded successfully - postId: {}, title: {}, imgName: {}", post.getId(), post.getTitle(), fileName);
         return Image.builder()
                 .path(amazonS3.getUrl(bucket, fileName).toString())
                 .fileName(multipartFile.getOriginalFilename())

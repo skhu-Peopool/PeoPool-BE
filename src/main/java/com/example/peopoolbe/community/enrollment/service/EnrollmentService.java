@@ -88,6 +88,15 @@ public class EnrollmentService {
         return EnrollmentApplyingList.fromApplyingRes(enrollmentApplyingList);
     }
 
+    public EnrollmentApplyingList getApplyingListByMemberApproved(Principal principal) {
+        Member member = memberService.getUserByToken(principal);
+        List<Enrollment> enrollmentList = enrollmentRepository.findAllByMemberAndStatus(member, EnrollmentStatus.APPROVED);
+
+        return EnrollmentApplyingList.fromApplyingRes(enrollmentList.stream()
+                .map(EnrollmentApplyingRes::from)
+                .toList());
+    }
+
     public EnrollmentApplyingList getApplyingListByPost(Principal principal, Long postId) {
         Member member = memberService.getUserByToken(principal);
         Post post = postRepository.findById(postId)

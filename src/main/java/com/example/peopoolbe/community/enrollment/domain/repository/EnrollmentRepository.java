@@ -7,6 +7,7 @@ import com.example.peopoolbe.member.domain.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
@@ -22,4 +23,6 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
         WHERE e.post.id = :postId
     """)
     Integer countEnrollmentByPostId(Long postId);
+
+    List<Enrollment> findAllByMemberAndStatus(Member member, EnrollmentStatus status);
 }

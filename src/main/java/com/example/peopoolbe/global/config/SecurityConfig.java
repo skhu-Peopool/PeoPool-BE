@@ -2,6 +2,7 @@ package com.example.peopoolbe.global.config;
 
 import com.example.peopoolbe.global.jwt.service.JwtFilter;
 import com.example.peopoolbe.global.jwt.service.TokenProvider;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,6 +39,18 @@ public class SecurityConfig{
                         .requestMatchers("/post/list", "/post/{postId:\\d+}").permitAll()
                         .requestMatchers("/enrollment/**").permitAll()
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((req, res, ex1) -> {
+                            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            res.setContentType("application/json;charset=UTF-8");
+                            res.getWriter().write("{\"error\": \"Unauthorized\"}");
+                        })
+                        .accessDeniedHandler((req, res, ex2) -> {
+                            res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            res.setContentType("application/json;charset=UTF-8");
+                            res.getWriter().write("{\"error\": \"Forbidden\"}");
+                        })
                 )
                 .addFilterBefore(new JwtFilter(tokenprovider), UsernamePasswordAuthenticationFilter.class)
                 .build();
